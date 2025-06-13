@@ -1,0 +1,73 @@
+name: 기능 구현/리팩터링 작업
+description: 프론트엔드 기능 구현 또는 리팩터링 작업 추가
+title: "[feat] "
+labels: ["feature", "frontend"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📌 작업 개요
+        프론트엔드 기능 구현/리팩터링 작업을 설명해주세요 🍓
+  
+  - type: textarea
+    id: summary
+    attributes:
+      label: 작업 설명
+      placeholder: |
+        예: 
+        - 로그인 페이지 UI 구현
+        - 요금제 추천 컴포넌트 리팩터링
+        - API 연동 로직 추가
+    validations:
+      required: true
+  
+  - type: textarea
+    id: checklist
+    attributes:
+      label: 작업 체크리스트
+      value: |
+        ## 🎨 UI/UX
+        - [ ] 컴포넌트 구현
+        - [ ] 스타일링 (CSS/Tailwind)
+        - [ ] 반응형 디자인
+        - [ ] 접근성 고려
+
+        ## ⚙️ 기능 구현
+        - [ ] 상태 관리 (useState/useContext)
+        - [ ] API 연동
+        - [ ] 폼 검증
+        - [ ] 에러 핸들링
+
+        ## 🧪 테스트 & 품질
+        - [ ] 컴포넌트 테스트 작성
+        - [ ] 브라우저 호환성 확인
+        - [ ] 성능 최적화
+        - [ ] 코드 리뷰 준비
+
+        ## 📱 추가 고려사항
+        - [ ] 모바일 최적화
+        - [ ] 로딩 상태 처리
+        - [ ] SEO 최적화 (필요시)
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 우선순위
+      options:
+        - 🔴 높음 (urgent)
+        - 🟡 보통 (normal)
+        - 🟢 낮음 (low)
+    validations:
+      required: true
+
+  - type: textarea
+    id: design_reference
+    attributes:
+      label: 디자인 참고자료
+      placeholder: |
+        디자인 시안, 레퍼런스 링크, 스크린샷 등을 첨부해주세요
+    validations:
+      required: false
