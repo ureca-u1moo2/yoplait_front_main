@@ -140,9 +140,30 @@ const refreshAccessToken = async () => {
 };
 
 // 로그아웃 처리
-export const handleLogout = () => {
-  tokenManager.clearTokens();
-  window.location.href = '/login';
+export const handleLogout = async () => {
+  try {
+    const refreshToken = tokenManager.getRefreshToken();
+    
+    if (refreshToken) {
+      // 서버에 로그아웃 요청
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+      
+      await fetch(`${API_BASE_URL}/api/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-REFRESH-TOKEN': refreshToken
+        }
+      });
+    }
+  } catch (error) {
+    console.error('서버 로그아웃 요청 실패:', error);
+    // 서버 요청이 실패해도 클라이언트 측 로그아웃은 진행
+  } finally {
+    // 클라이언트 측 토큰 삭제 및 리다이렉트
+    tokenManager.clearTokens();
+    window.location.href = '/login';
+  }
 };
 
 // 로그인 리다이렉트 처리
