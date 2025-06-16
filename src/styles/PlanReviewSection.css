@@ -241,13 +241,13 @@
 }
 
 .maid-edit-btn {
-  background: linear-gradient(45deg, #a855f7, #c084fc);
+  background: linear-gradient(45deg, #de99f0, #c084fc);
   color: white;
   box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
 }
 
 .maid-edit-btn:hover {
-  background: linear-gradient(45deg, #9333ea, #a855f7);
+  background: linear-gradient(45deg, #de99f0, #a855f7);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
 }
@@ -255,6 +255,7 @@
 .maid-save-btn {
   background: linear-gradient(45deg, #10b981, #34d399);
   color: white;
+  margin-top: 0.5rem;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
@@ -267,6 +268,7 @@
 .maid-cancel-btn {
   background: linear-gradient(45deg, #64748b, #94a3b8);
   color: white;
+  margin-top: 0.5rem;
   box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
 }
 
