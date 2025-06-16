@@ -1,0 +1,313 @@
+
+
+
+/* styles/PlanCard.css - 메이드카페 핑크 테마 */
+
+.plan-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 231, 243, 0.9));
+  border: 2px solid #f9a8d4;
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.1),
+    0 0 0 1px rgba(244, 114, 182, 0.05);
+}
+
+.plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transition: all 0.6s ease;
+}
+
+.plan-card:hover {
+  border-color: #ec4899;
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(244, 114, 182, 0.25),
+    0 0 0 1px rgba(244, 114, 182, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.plan-card:hover::before {
+  left: 100%;
+}
+
+/* 전화번호 타이틀 */
+.plan-phone {
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #be185d, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 1rem 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan-phone::before {
+  content: '📱';
+  font-size: 1.2rem;
+  filter: drop-shadow(0 2px 4px rgba(236, 72, 153, 0.3));
+}
+
+.plan-phone::after {
+  content: '✨';
+  position: absolute;
+  right: -30px;
+  top: 0;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.plan-card:hover .plan-phone::after {
+  opacity: 1;
+  right: -25px;
+}
+
+/* 요금제 설명 */
+.plan-description {
+  color: #be185d;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+  background: rgba(252, 231, 243, 0.5);
+  padding: 0.8rem 1rem;
+  border-radius: 15px;
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  position: relative;
+}
+
+.plan-description::before {
+  /* content: '💬'; */
+  position: absolute;
+  left: -10px;
+  top: -5px;
+  font-size: 1rem;
+  background: white;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+/* 가입일 정보 */
+.plan-date {
+  color: #be185d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan-date::before {
+  /* content: '📅'; */
+  font-size: 1rem;
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.2);
+}
+
+/* 할인가 정보 */
+.plan-price {
+  color: #be185d;
+  font-size: 1.1rem;
+  font-weight: 700;
+  /* margin: 0 0 1.5rem 0; */
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan-price::before {
+  /* content: '💰'; */
+  font-size: 1.1rem;
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  color: white;
+  padding: 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.3);
+}
+
+/* 버튼 컨테이너 */
+.plan-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.plan-buttons button {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 100px;
+}
+
+/* 해지 버튼 (주의 스타일) */
+.plan-buttons button:first-child {
+  background: linear-gradient(45deg, #fef2f2, #fecaca);
+  color: #dc2626;
+  border: 2px solid #fca5a5;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
+}
+
+.plan-buttons button:first-child:hover {
+  background: linear-gradient(45deg, #fecaca, #f87171);
+  color: white;
+  border-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.plan-buttons button:first-child::before {
+  content: '⚠️';
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.plan-buttons button:first-child:hover::before {
+  left: 8px;
+}
+
+/* 리뷰 작성 버튼 */
+.plan-buttons button:last-child {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  color: white;
+  box-shadow: 
+    0 4px 15px rgba(244, 114, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.plan-buttons button:last-child:hover {
+  background: linear-gradient(45deg, #db2777, #ec4899);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(244, 114, 182, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.plan-buttons button:last-child::before {
+  content: '✍️';
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.plan-buttons button:last-child:hover::before {
+  left: 8px;
+}
+
+/* 호버 효과들 */
+.plan-card:hover .plan-description {
+  background: rgba(244, 114, 182, 0.1);
+  border-color: #f472b6;
+}
+
+.plan-card:hover .plan-date::before,
+.plan-card:hover .plan-price::before {
+  transform: scale(1.1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .plan-card {
+    padding: 1rem;
+  }
+  
+  .plan-phone {
+    font-size: 1.2rem;
+  }
+  
+  .plan-phone::after {
+    display: none;
+  }
+  
+  .plan-buttons {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .plan-buttons button {
+    flex: 1;
+    min-width: auto;
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
+  }
+  
+  .plan-buttons button::before {
+    display: none;
+  }
+}
+
+/* 카드 진입 애니메이션 */
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plan-card {
+  animation: cardSlideIn 0.5s ease-out;
+}
+
+/* 버튼 클릭 효과 */
+.plan-buttons button:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* 핑크 아이콘 효과 */
+.pink-icon {
+  color: #ec4899;
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  padding: 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+/* 정렬용 */
+.plan-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
