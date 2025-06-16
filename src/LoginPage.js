@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberCredentials, setRememberCredentials] = useState(false);
   const [notification, setNotification] = useState(null);
 
   // 알림 자동 닫기
@@ -35,6 +35,20 @@ const LoginPage = () => {
   useEffect(() => {
     if (userManager.isLoggedIn()) {
       window.location.href = '/';
+    }
+  }, []);
+
+  // 저장된 아이디/비밀번호 불러오기
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('savedEmail');
+    const savedPassword = localStorage.getItem('savedPassword');
+    
+    if (savedEmail && savedPassword) {
+      setFormData({
+        email: savedEmail,
+        password: savedPassword
+      });
+      setRememberCredentials(true);
     }
   }, []);
 
@@ -91,8 +105,7 @@ const LoginPage = () => {
         },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password,
-          rememberMe: rememberMe
+          password: formData.password
         })
       });
       
@@ -117,6 +130,15 @@ const LoginPage = () => {
         
         // 토큰과 사용자 정보 저장
         handleLoginSuccess(data);
+        
+        // 아이디/비밀번호 기억하기 처리
+        if (rememberCredentials) {
+          localStorage.setItem('savedEmail', formData.email);
+          localStorage.setItem('savedPassword', formData.password);
+        } else {
+          localStorage.removeItem('savedEmail');
+          localStorage.removeItem('savedPassword');
+        }
         
         // 성공 알림 표시
         showNotification('success', '로그인 성공! 메인 페이지로 이동합니다... 🍓');
@@ -294,17 +316,17 @@ const LoginPage = () => {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember Credentials & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  checked={rememberCredentials}
+                  onChange={(e) => setRememberCredentials(e.target.checked)}
                   className="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300 rounded focus:ring-pink-500 focus:ring-2"
                   disabled={isLoading}
                 />
-                <span className="ml-2 text-sm text-gray-600">로그인 상태 유지</span>
+                <span className="ml-2 text-sm text-gray-600">아이디/비밀번호 기억하기</span>
               </label>
               <button 
                 type="button"

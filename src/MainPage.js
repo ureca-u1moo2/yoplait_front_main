@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Smartphone, DollarSign, Users, User, LogOut, Heart, CheckCircle, X, AlertCircle } from 'lucide-react';
+import { Smartphone, DollarSign, Users, User, LogOut, CheckCircle, X, AlertCircle, MessageCircle } from 'lucide-react';
 import { userManager, handleLogout } from './auth';
 
 const TelecomMainPage = () => {
@@ -9,6 +9,9 @@ const TelecomMainPage = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [notification, setNotification] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  // API 연동을 위한 새로운 상태들
+  const [popularPlans, setPopularPlans] = useState([]);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
 
   // 알림 자동 닫기
   useEffect(() => {
@@ -55,6 +58,59 @@ const TelecomMainPage = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
+  // 인기 요금제 데이터 로드 - API 연동
+  useEffect(() => {
+    const fetchPopularPlans = async () => {
+      setIsLoadingPlans(true);
+      try {
+        const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+        
+        const response = await fetch(`${API_BASE_URL}/api/plans?sortBy=popular`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.result === 'SUCCESS' && data.data) {
+            // API 데이터를 UI에 맞게 변환
+            const transformedPlans = data.data.slice(0, 3).map((plan, index) => ({
+              id: plan.id,
+              name: plan.name,
+              price: `${plan.price.toLocaleString()}원`,
+              data: formatDataAmount(plan.dataAmount),
+              voice: formatCallAmount(plan.callAmount),
+              message: formatSmsAmount(plan.smsAmount),
+              description: plan.description,
+              popular: index === 1, // 두번째 요금제를 인기 요금제로 설정
+              emoji: getEmoji(index),
+              company: "LG U+",
+              createdAt: plan.createdAt
+            }));
+            
+            setPopularPlans(transformedPlans);
+          } else {
+            console.error('API 응답 형식 오류:', data);
+            setPopularPlans(getDefaultPlans()); // 기본 데이터 사용
+          }
+        } else {
+          console.error('API 요청 실패:', response.status);
+          setPopularPlans(getDefaultPlans()); // 기본 데이터 사용
+        }
+      } catch (error) {
+        console.error('요금제 데이터 로드 실패:', error);
+        setPopularPlans(getDefaultPlans()); // 기본 데이터 사용
+      } finally {
+        setIsLoadingPlans(false);
+      }
+    };
+
+    fetchPopularPlans();
+  }, []);
+
   // 사용자 메뉴 외부 클릭 감지
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -68,7 +124,6 @@ const TelecomMainPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showUserMenu]);
-
 
   const handleLogoutClick = () => {
     setShowLogoutConfirm(true);
@@ -114,36 +169,46 @@ const TelecomMainPage = () => {
     showNotification('info', `${menu} 페이지 준비 중입니다.`);
   };
 
-  const features = [
-    {
-      icon: <Smartphone className="w-8 h-8 text-pink-500" />,
-      title: "AI 맞춤 요금제 추천",
-      description: "사용 패턴을 분석하여 가장 적합한 요금제를 추천해드립니다."
-    },
-    {
-      icon: <DollarSign className="w-8 h-8 text-rose-500" />,
-      title: "요금 절약 분석",
-      description: "현재 요금제와 비교하여 절약 가능한 금액을 정확히 계산해드립니다."
-    },
-    {
-      icon: <Users className="w-8 h-8 text-pink-400" />,
-      title: "가족 요금제 최적화",
-      description: "가족 구성원별 사용량을 고려한 최적의 가족 요금제를 추천드립니다."
+  // 데이터 변환 함수들 (-1일 때 무제한 처리)
+  const formatDataAmount = (dataAmount) => {
+    if (!dataAmount || dataAmount === -1 || dataAmount === 999999999) return "무제한";
+    if (dataAmount >= 1024) {
+      return `${Math.floor(dataAmount / 1024)}GB`;
     }
-  ];
+    return `${dataAmount}MB`;
+  };
 
-  const popularPlans = [
+  const formatCallAmount = (callAmount) => {
+    if (!callAmount || callAmount === -1 || callAmount === 999999999) return "무제한";
+    return `${callAmount}분`;
+  };
+
+  const formatSmsAmount = (smsAmount) => {
+    if (!smsAmount || smsAmount === -1 || smsAmount === 999999999) return "무제한";
+    return `${smsAmount}건`;
+  };
+
+  const getEmoji = (index) => {
+    const emojis = ["🥛", "🍓", "👑", "💎", "🌟"];
+    return emojis[index] || "📱";
+  };
+
+  // 기본 요금제 데이터 (API 실패 시 폴백)
+  const getDefaultPlans = () => [
     {
+      id: "fallback-1",
       name: "LG U+ 슬림",
       price: "25,000원",
       data: "3GB + 매일 1GB",
       voice: "무제한",
-      message: "기본 제공",
+      message: "무제한",
       popular: false,
       emoji: "🥛",
-      company: "LG U+"
+      company: "LG U+",
+      description: "기본 요금제"
     },
     {
+      id: "fallback-2", 
       name: "LG U+ 5GX 레귤러",
       price: "45,000원",
       data: "12GB + 매일 300MB",
@@ -151,35 +216,42 @@ const TelecomMainPage = () => {
       message: "무제한",
       popular: true,
       emoji: "🍓",
-      company: "LG U+"
+      company: "LG U+",
+      description: "인기 요금제"
     },
     {
+      id: "fallback-3",
       name: "LG U+ 프리미엄",
       price: "65,000원",
       data: "100GB",
-      voice: "무제한",
+      voice: "무제한", 
       message: "무제한",
       popular: false,
       emoji: "👑",
-      company: "LG U+"
+      company: "LG U+",
+      description: "프리미엄 요금제"
     }
   ];
 
-  const testimonials = [
+  const handlePlanDetail = (planId) => {
+    showNotification('info', `${planId} 요금제 상세 페이지로 이동합니다. (준비 중)`);
+  };
+
+  const features = [
     {
-      name: "김민수",
-      comment: "월 2만원 절약했어요! 정말 정확한 추천이었습니다.",
-      rating: 5
+      icon: <Smartphone className="w-8 h-8 text-pink-500" />,
+      title: "AI 맞춤 요금제 추천",
+      description: "사용 패턴을 분석하여 가장 적합한 요금제를 추천해드립니다."
     },
     {
-      name: "이지영",
-      comment: "복잡한 요금제를 쉽게 비교할 수 있어서 좋았어요.",
-      rating: 5
+      icon: <Users className="w-8 h-8 text-pink-400" />,
+      title: "비회원 맞춤 추천",
+      description: "비회원도 간단한 질의 응답을 통해 맞춤 요금제를 추천받을 수 있습니다."
     },
     {
-      name: "박철수",
-      comment: "가족 요금제로 바꾸니 훨씬 저렴해졌네요.",
-      rating: 4
+      icon: <DollarSign className="w-8 h-8 text-rose-500" />,
+      title: "요금제 비교",
+      description: "다양한 요금제를 비교하여 최적의 선택을 도와드립니다."
     }
   ];
 
@@ -284,22 +356,22 @@ const TelecomMainPage = () => {
             </div>
             <div className="hidden md:flex space-x-8">
               <button 
+                onClick={() => handleNavClick('요금제 목록')}
+                className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
+              >
+                요금제 목록
+              </button>
+              <button 
                 onClick={() => handleNavClick('요금제 비교')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 요금제 비교
               </button>
               <button 
-                onClick={() => handleNavClick('통신사별 혜택')}
+                onClick={() => handleNavClick('FAQ')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
-                통신사별 혜택
-              </button>
-              <button 
-                onClick={() => handleNavClick('고객센터')}
-                className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
-              >
-                고객센터
+                FAQ
               </button>
             </div>
             
@@ -330,26 +402,13 @@ const TelecomMainPage = () => {
                       </div>
                       <div className="py-1">
                         <button
-                          onClick={() => handleMenuClick('내 정보 관리')}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
-                        >
-                          <User className="w-4 h-4 mr-3" />
-                          내 정보 관리
-                        </button>
-                        <button
                           onClick={() => handleMenuClick('내 요금제 현황')}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
                         >
                           <Smartphone className="w-4 h-4 mr-3" />
                           내 요금제 현황
                         </button>
-                        <button
-                          onClick={() => handleMenuClick('관심 요금제')}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
-                        >
-                          <Heart className="w-4 h-4 mr-3" />
-                          관심 요금제
-                        </button>
+ 
                         <div className="border-t border-pink-100 my-1"></div>
                         <button
                           onClick={handleLogoutClick}
@@ -410,9 +469,12 @@ const TelecomMainPage = () => {
             </h1>
             <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
               {isLoggedIn ? (
-                "개인 맞춤형 요금제 추천으로 최적의 절약을 경험해보세요."
+                "개인 맞춤형 요금제 추천으로 최적의 절약을 경험해보세요"
               ) : (
-                "AI가 분석하는 개인 맞춤형 요금제 추천 서비스. 복잡한 요금제 비교는 이제 그만, 3분만에 최적의 요금제를 찾아보세요."
+                <>
+                  AI가 분석하는 개인 맞춤형 요금제 추천 서비스<br/>
+                  복잡한 요금제 비교는 이제 그만, 3분만에 최적의 요금제를 찾아보세요
+                </>
               )}
             </p>
             
@@ -491,7 +553,7 @@ const TelecomMainPage = () => {
         </div>
       </section>
 
-      {/* Popular Plans Section */}
+      {/* Popular Plans Section - API 연동된 부분 */}
       <section className="py-20 bg-gradient-to-br from-pink-50 to-rose-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -499,80 +561,83 @@ const TelecomMainPage = () => {
             <p className="text-xl text-gray-600">많은 사용자들이 선택한 추천 요금제</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {popularPlans.map((plan, index) => (
-              <div key={index} className={`bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl relative border-2 transition-all hover:transform hover:scale-105 ${plan.popular ? 'border-pink-400 transform scale-105 shadow-2xl' : 'border-pink-100'}`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-pink-400 to-rose-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-                      추천
-                    </span>
-                  </div>
-                )}
-                <div className="text-center">
-                  <div className="text-4xl mb-3">{plan.emoji}</div>
-                  <div className="text-xs font-medium text-gray-500 mb-1">{plan.company}</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent mb-6">
-                    {plan.price}<span className="text-lg text-gray-500">/월</span>
-                  </div>
-                  
-                  <div className="space-y-4 mb-8">
-                    <div className="flex justify-between items-center bg-pink-50 rounded-2xl p-3">
-                      <span className="text-gray-600">📱 데이터</span>
-                      <span className="font-semibold text-pink-600">{plan.data}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-rose-50 rounded-2xl p-3">
-                      <span className="text-gray-600">📞 음성통화</span>
-                      <span className="font-semibold text-rose-600">{plan.voice}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-pink-50 rounded-2xl p-3">
-                      <span className="text-gray-600">💌 문자메시지</span>
-                      <span className="font-semibold text-pink-600">{plan.message}</span>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={() => showNotification('info', `${plan.name} 상세 페이지 준비 중입니다.`)}
-                    className={`w-full py-4 rounded-2xl font-semibold transition-all transform hover:scale-105 ${
-                      plan.popular 
-                        ? 'bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600 shadow-lg' 
-                        : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
-                    }`}
-                  >
-                    자세히 보기
-                  </button>
-                </div>
+          {/* 로딩 상태 또는 요금제 카드들 */}
+          {isLoadingPlans ? (
+            // 로딩 상태
+            <div className="flex justify-center items-center py-20">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">인기 요금제를 불러오는 중...</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
+          ) : (
+            // 요금제 카드들
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {popularPlans.map((plan, index) => (
+                <div 
+                  key={plan.id || index}
+                  className={`bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl relative border-2 transition-all cursor-pointer hover:shadow-2xl ${
+                    plan.popular 
+                      ? 'border-pink-400 transform scale-105 shadow-2xl' 
+                      : 'border-pink-100 hover:border-pink-300 hover:transform hover:scale-102'
+                  }`}
+                  onClick={() => handlePlanDetail(plan.id)}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-gradient-to-r from-pink-400 to-rose-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
+                        추천
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-center">
+                    <div className="text-4xl mb-3">{plan.emoji}</div>
+                    <div className="text-xs font-medium text-gray-500 mb-1">{plan.company}</div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                    <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent mb-6">
+                      {plan.price}<span className="text-lg text-gray-500">/월</span>
+                    </div>
+                    
+                    <div className="space-y-4 mb-8">
+                      <div className="flex justify-between items-center bg-pink-50 rounded-2xl p-3">
+                        <span className="text-gray-600">📱 데이터</span>
+                        <span className="font-semibold text-pink-600">{plan.data}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-rose-50 rounded-2xl p-3">
+                        <span className="text-gray-600">📞 음성통화</span>
+                        <span className="font-semibold text-rose-600">{plan.voice}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-pink-50 rounded-2xl p-3">
+                        <span className="text-gray-600">💌 문자메시지</span>
+                        <span className="font-semibold text-pink-600">{plan.message}</span>
+                      </div>
+                    </div>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">고객 후기</h2>
-            <p className="text-xl text-gray-600">실제 사용자들의 생생한 경험담</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-pink-100 hover:shadow-xl transition-all">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Heart 
-                      key={i} 
-                      className={`w-5 h-5 ${i < testimonial.rating ? 'text-pink-400 fill-current' : 'text-gray-300'}`} 
-                    />
-                  ))}
+                    {plan.description && (
+                      <div className="text-sm text-gray-500 mb-4 p-3 bg-gray-50 rounded-xl">
+                        {plan.description}
+                      </div>
+                    )}
+                    
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showNotification('info', `${plan.name} 상세 페이지 준비 중입니다.`);
+                      }}
+                      className={`w-full py-4 rounded-2xl font-semibold transition-all transform hover:scale-105 ${
+                        plan.popular 
+                          ? 'bg-gradient-to-r from-pink-400 to-rose-500 text-white hover:from-pink-500 hover:to-rose-600 shadow-lg' 
+                          : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
+                      }`}
+                    >
+                      자세히 보기
+                    </button>
+                  </div>
                 </div>
-                <p className="text-gray-700 mb-4 leading-relaxed">"{testimonial.comment}"</p>
-                <div className="font-semibold text-gray-900">- {testimonial.name}</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -613,22 +678,16 @@ const TelecomMainPage = () => {
                 >
                   무료 회원가입 시작
                 </button>
-                <button 
-                  onClick={() => showNotification('info', '서비스 둘러보기 페이지 준비 중입니다.')}
-                  className="border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-white hover:text-pink-500 transition-all transform hover:scale-105"
-                >
-                  서비스 둘러보기
-                </button>
               </>
             )}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer - 서비스만 간단하게 */}
       <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center mr-3">
@@ -647,36 +706,47 @@ const TelecomMainPage = () => {
             <div>
               <h4 className="font-semibold mb-4 text-pink-300">서비스</h4>
               <div className="space-y-2 text-gray-400">
-                <div>요금제 추천</div>
-                <div>요금 비교</div>
-                <div>통신사 혜택</div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4 text-pink-300">고객지원</h4>
-              <div className="space-y-2 text-gray-400">
-                <div>자주 묻는 질문</div>
-                <div>1:1 문의</div>
-                <div>이용가이드</div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4 text-pink-300">회사정보</h4>
-              <div className="space-y-2 text-gray-400">
-                <div>회사소개</div>
-                <div>개인정보처리방침</div>
-                <div>이용약관</div>
+                <button 
+                  onClick={() => handleNavClick('요금제 목록')}
+                  className="block hover:text-pink-300 transition-colors cursor-pointer text-left"
+                >
+                  요금제 목록
+                </button>
+                <button 
+                  onClick={() => handleNavClick('요금제 비교')}
+                  className="block hover:text-pink-300 transition-colors cursor-pointer text-left"
+                >
+                  요금제 비교
+                </button>
+                <button 
+                  onClick={() => handleNavClick('FAQ')}
+                  className="block hover:text-pink-300 transition-colors cursor-pointer text-left"
+                >
+                  FAQ
+                </button>
               </div>
             </div>
           </div>
           
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 요플레 (요금 플래너). 스마트한 요금제 선택의 파트너</p>
+            <p>&copy; 2025 요플레 : 스마트한 요금제 선택의 파트너</p>
           </div>
         </div>
       </footer>
+
+      {/* 챗봇 아이콘 - 우측 하단 고정 */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button 
+          onClick={() => window.location.href = '/chatbot'}
+          className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group"
+        >
+          <MessageCircle className="w-7 h-7 text-white group-hover:animate-pulse" />
+        </button>
+        {/* 툴팁 */}
+        <div className="absolute bottom-20 right-0 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          AI 챗봇 문의
+        </div>
+      </div>
     </div>
   );
 };
