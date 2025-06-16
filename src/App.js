@@ -7,6 +7,7 @@ import PlanDetailPage from './pages/PlanDetailPage';
 import PlanComparePage from './pages/PlanComparePage';
 import MyPage from './pages/MyPage';
 import MainLayout from './components/layout/MainLayout';
+import FindPasswordPage from './FindPasswordPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/plans/:id" element={<PlanDetailPage />} />
           <Route path="/plans/compare" element={<PlanComparePage />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/find-password" element={<FindPasswordPage />} />
         </Route>
         </Routes>
       </div>
