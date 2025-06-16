@@ -173,19 +173,19 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
                     {editReviewId !== review.id ? (
                       <>
                         <button onClick={() => startEdit(review)} className="maid-action-btn maid-edit-btn">
-                          ✏️ 수정 시작
+                          수정 시작
                         </button>
                         <button onClick={() => handleDeleteReview(review.id)} className="maid-action-btn maid-delete-btn">
-                          🗑️ 삭제
+                          삭제
                         </button>
                       </>
                     ) : (
                       <>
                         <button onClick={() => handleUpdateReview(review.id)} className="maid-action-btn maid-save-btn">
-                          💾 저장
+                          저장
                         </button>
                         <button onClick={cancelEdit} className="maid-action-btn maid-cancel-btn">
-                          ❌ 취소
+                          취소
                         </button>
                       </>
                     )}

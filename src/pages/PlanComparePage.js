@@ -196,7 +196,7 @@ function PlanComparePage() {
                   <div className="compare-info-content">
                     <div className="compare-info-label">데이터</div>
                     <div className="compare-info-value">
-                      {plan.dataAmountText || `${plan.dataAmount}GB`}
+                      {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`}
                     </div>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ function PlanComparePage() {
                   <div className="compare-info-content">
                     <div className="compare-info-label">통화</div>
                     <div className="compare-info-value">
-                      {plan.callAmountText || `${plan.callAmount}분`}
+                       {plan.callAmount === -1 ? '무제한' : `${plan.callAmount}분`}
                     </div>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ function PlanComparePage() {
                   <div className="compare-info-content">
                     <div className="compare-info-label">문자</div>
                     <div className="compare-info-value">
-                      {plan.smsAmountText || `${plan.smsAmount}건`}
+                      {plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}
                     </div>
                   </div>
                 </div>

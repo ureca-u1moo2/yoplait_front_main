@@ -92,7 +92,7 @@ function PlanListPage() {
       <div className="maid-page-header">
         <h1 className="maid-page-title">요금제 목록</h1>
         <p className="maid-page-subtitle">
-          달콜한 다양한 요금제를 사르르 비교하고 내 입맛에 맞는 요금제를 찾아보세요 ♡
+          달콤한 다양한 요금제를 사르르 비교하고 내 입맛에 맞는 요금제를 찾아보세요 ♡
         </p>
       </div>
 
@@ -171,34 +171,45 @@ function PlanListPage() {
                   onClick={() => navigate(`/plans/${plan.id}`)}
                   className="maid-plan-content"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <h3 className="maid-plan-name">
-                      {plan.name}
-                    </h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <div className="maid-price-tag">
-                        {plan.price.toLocaleString()}원
-                      </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+                      <h3 className="maid-plan-name" style={{ margin: 0, marginRight: '0.5rem' }}>
+                        {plan.name}
+                      </h3>
+                      {/* 요금제 태그 */}
+                      {plan.tags && plan.tags.length > 0 && (
+                        <div className="maid-tag-list-inline">
+                          {plan.tags.map(tag => (
+                            <div key={tag.id} className="maid-tag-item-inline">
+                              <span className="maid-tag-name">#{tag.tagName}</span>
+                              <span className="maid-tag-desc">{tag.description}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>                 
+                    <div className="maid-price-tag">
+                      {plan.price.toLocaleString()}원
+                    </div>
+                  </div>                
                   <div className="maid-plan-info">
                     <div className="maid-info-item">
                       <span style={pinkIconStyle}>
                         <Smartphone size={16} />
                       </span>
-                      <span>데이터: {plan.dataAmountText || plan.dataAmount + 'GB'}</span>
+                      <span>데이터: {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`}</span>
                     </div>
                     <div className="maid-info-item">
                       <span style={pinkIconStyle}>
                         <Phone size={16} />
                       </span>
-                      <span>통화: {plan.callAmountText || plan.callAmount + '분'}</span>
+                      <span>통화: {plan.callAmount === -1 ? '무제한' : `${plan.callAmount}분`}</span>
                     </div>
                     <div className="maid-info-item">
                       <span style={pinkIconStyle}>
                         <MessageSquare size={16} />
                       </span>
-                      <span>문자: {plan.smsAmountText || plan.smsAmount + '건'}</span>
+                      <span>문자: {plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}</span>
                     </div>
                     {plan.specialFeatures && (
                       <div className="maid-info-item">
@@ -233,7 +244,7 @@ function PlanListPage() {
               {selectedPlans.length}개 요금제 선택됨 💕
             </p>
             <p className="maid-floating-sub">
-              최대 4개까지 비교 가능해요!
+              마음에 드는 요금제를 골라보세요!
             </p>
           </div>
           <button 

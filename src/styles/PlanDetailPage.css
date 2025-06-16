@@ -526,3 +526,14 @@
   line-height: 1.6;
 }
 
+/* 요금제 설명 부분 */
+.maid-plan-description {
+  font-size: 1rem;
+  color: #6b7280; /* Tailwind의 text-gray-500 색상 */
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+

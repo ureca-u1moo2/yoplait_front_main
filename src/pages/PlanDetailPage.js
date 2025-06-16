@@ -133,6 +133,13 @@ function PlanDetailPage() {
           )}
         </div>
 
+        {/* 요금제 설명 추가 */}
+        {plan.description && (
+          <p className="maid-plan-description">
+            {plan.description}
+          </p>
+        )}
+
         {/* 요금제 정보 그리드 */}
         <div className="maid-plan-info-grid">
           <div className="maid-info-card">
@@ -143,7 +150,7 @@ function PlanDetailPage() {
               데이터
             </div>
             <div className="maid-info-value">
-              {plan.dataAmountText || plan.dataAmount + 'GB'}
+              {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`}
             </div>
           </div>
 
@@ -155,7 +162,7 @@ function PlanDetailPage() {
               통화
             </div>
             <div className="maid-info-value">
-              {plan.callAmountText || plan.callAmount + '분'}
+              {plan.callAmount === -1 ? '무제한' : `${plan.callAmount}분`}
             </div>
           </div>
 
@@ -167,7 +174,7 @@ function PlanDetailPage() {
               문자
             </div>
             <div className="maid-info-value">
-              {plan.smsAmountText || plan.smsAmount + '건'}
+              {plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}
             </div>
           </div>
 
