@@ -8,6 +8,7 @@ import PlanComparePage from './pages/PlanComparePage';
 import MyPage from './pages/MyPage';
 import MainLayout from './components/layout/MainLayout';
 import FindPasswordPage from './FindPasswordPage';
+import FAQPage from './pages/FAQPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/plans/compare" element={<PlanComparePage />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/find-password" element={<FindPasswordPage />} />
+          <Route path="/faq" element={<FAQPage />} />
         </Route>
         </Routes>
       </div>
