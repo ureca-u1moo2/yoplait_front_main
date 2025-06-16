@@ -9,6 +9,7 @@ import MyPage from './pages/MyPage';
 import MainLayout from './components/layout/MainLayout';
 import FindPasswordPage from './FindPasswordPage';
 import FAQPage from './pages/FAQPage';
+import ChatbotPage from 'pages/ChatbotPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/find-password" element={<FindPasswordPage />} />
           <Route path="/faq" element={<FAQPage />} />
+          <Route path="/chatbot" element={<ChatbotPage />} />
         </Route>
         </Routes>
       </div>
