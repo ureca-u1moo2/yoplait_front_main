@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Smartphone, DollarSign, Users, User, LogOut, CheckCircle, X, AlertCircle, MessageCircle } from 'lucide-react';
 import { userManager, handleLogout } from './auth';
+import { useNavigate } from 'react-router-dom';
 
 const TelecomMainPage = () => {
   const [selectedUsage, setSelectedUsage] = useState('');
@@ -12,6 +13,7 @@ const TelecomMainPage = () => {
   // API 연동을 위한 새로운 상태들
   const [popularPlans, setPopularPlans] = useState([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+  const navigate = useNavigate(); 
 
   // 알림 자동 닫기
   useEffect(() => {
@@ -162,11 +164,19 @@ const TelecomMainPage = () => {
   };
 
   const handleNavClick = (feature) => {
-    showNotification('info', `${feature} 페이지 준비 중입니다.`);
+      if (feature === '요금제 목록') {
+        navigate('/plans');
+      } else {
+        showNotification('info', `${feature} 페이지 준비 중입니다.`);
+      }
   };
 
   const handleMenuClick = (menu) => {
-    showNotification('info', `${menu} 페이지 준비 중입니다.`);
+      if (menu === '내 요금제 현황') {
+        navigate('/mypage');
+      } else {
+        showNotification('info', `${menu} 페이지 준비 중입니다.`);
+      }
   };
 
   // 데이터 변환 함수들 (-1일 때 무제한 처리)
@@ -361,12 +371,13 @@ const TelecomMainPage = () => {
               >
                 요금제 목록
               </button>
-              <button 
+              {/*  불필요할 것으로 예상됨 */}
+              {/* <button 
                 onClick={() => handleNavClick('요금제 비교')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 요금제 비교
-              </button>
+              </button> */}
               <button 
                 onClick={() => handleNavClick('FAQ')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
