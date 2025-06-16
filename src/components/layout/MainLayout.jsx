@@ -1,7 +1,7 @@
 // 요금제 목록/상세/비교/마이페이지 메뉴 동일
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Smartphone, Heart } from 'lucide-react';
+import { User, LogOut, Smartphone, MessageCircle } from 'lucide-react';
 import { userManager, handleLogout } from '../../auth';
 
 const MainLayout = () => {
@@ -30,28 +30,20 @@ const MainLayout = () => {
   const handleMenuClick = (menu) => {
     setShowUserMenu(false);
     switch (menu) {
-      // case '내 정보 관리':
-      //   navigate('/mypage');
-      //   break;
       case '내 요금제 현황':
         navigate('/mypage');
         break;
-      // case '관심 요금제':
-      //   navigate('/mypage'); // 필요 시 경로 분기
-      //   break;
       default:
         break;
     }
   };
 
   return (
-    <div>
+    <div className="relative min-h-screen">
       <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b border-pink-100">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* 로고 영역 */}
             <Link to="/" className="flex items-center">
-            <div className="flex items-center">
               <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center mr-3">
                 <span className="text-white font-bold text-lg">🍓</span>
               </div>
@@ -59,10 +51,8 @@ const MainLayout = () => {
                 요플레
               </span>
               <span className="text-sm text-pink-400 ml-2">요금 플래너</span>
-            </div>
             </Link>
 
-            {/* 가운데 메뉴 */}
             <div className="hidden md:flex space-x-8">
               <button 
                 onClick={() => navigate('/plans')}
@@ -78,7 +68,6 @@ const MainLayout = () => {
               </button>
             </div>
 
-            {/* 로그인/회원가입 또는 유저 메뉴 */}
             <div className="flex items-center space-x-4">
               {isLoggedIn ? (
                 <div className="relative user-menu-container">
@@ -143,10 +132,24 @@ const MainLayout = () => {
         </nav>
       </header>
 
-      {/* 하위 페이지 출력 */}
       <main>
         <Outlet />
       </main>
+
+      {/* 챗봇 아이콘 - 우측 하단 고정 */}
+      {window.location.pathname !== '/chatbot' && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <button 
+            onClick={() => window.location.href = '/chatbot'}
+            className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group"
+          >
+            <MessageCircle className="w-7 h-7 text-white group-hover:animate-pulse" />
+          </button>
+          <div className="absolute bottom-20 right-0 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            AI 챗봇 문의
+          </div>
+        </div>
+      )}
     </div>
   );
 };
