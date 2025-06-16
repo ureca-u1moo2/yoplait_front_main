@@ -182,7 +182,7 @@ const LoginPage = () => {
 
   // 비밀번호 찾기 처리
   const handleForgotPassword = () => {
-    showNotification('info', '비밀번호 찾기 기능은 준비 중입니다 🍓');
+      window.location.href = '/find-password';
   };
 
   return (
