@@ -168,7 +168,7 @@ const TelecomMainPage = () => {
       if (feature === '요금제 목록') {
         navigate('/plans');
       } else {
-        showNotification('info', `${feature} 페이지 준비 중입니다.`);
+        navigate('/faq');
       }
   };
 
@@ -754,12 +754,6 @@ const TelecomMainPage = () => {
                   className="block hover:text-pink-300 transition-colors cursor-pointer text-left"
                 >
                   요금제 목록
-                </button>
-                <button 
-                  onClick={() => handleNavClick('요금제 비교')}
-                  className="block hover:text-pink-300 transition-colors cursor-pointer text-left"
-                >
-                  요금제 비교
                 </button>
                 <button 
                   onClick={() => handleNavClick('FAQ')}
