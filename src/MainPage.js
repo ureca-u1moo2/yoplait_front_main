@@ -167,8 +167,10 @@ const TelecomMainPage = () => {
   const handleNavClick = (feature) => {
       if (feature === '요금제 목록') {
         navigate('/plans');
-      } else {
+      } else if (feature === 'FAQ') {
         navigate('/faq');
+      } else {
+        showNotification('info', `${feature} 페이지 준비 중입니다.`);
       }
   };
 
