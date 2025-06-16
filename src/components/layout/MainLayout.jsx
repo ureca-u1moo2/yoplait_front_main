@@ -30,15 +30,15 @@ const MainLayout = () => {
   const handleMenuClick = (menu) => {
     setShowUserMenu(false);
     switch (menu) {
-      case '내 정보 관리':
-        navigate('/mypage');
-        break;
+      // case '내 정보 관리':
+      //   navigate('/mypage');
+      //   break;
       case '내 요금제 현황':
         navigate('/mypage');
         break;
-      case '관심 요금제':
-        navigate('/mypage'); // 필요 시 경로 분기
-        break;
+      // case '관심 요금제':
+      //   navigate('/mypage'); // 필요 시 경로 분기
+      //   break;
       default:
         break;
     }
@@ -68,19 +68,13 @@ const MainLayout = () => {
                 onClick={() => navigate('/plans')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
-                요금제 비교
+                요금제 목록
               </button>
               <button 
-                onClick={() => navigate('/benefits')}
+                onClick={() => navigate('/FAQ')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
-                통신사별 혜택
-              </button>
-              <button 
-                onClick={() => navigate('/support')}
-                className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
-              >
-                고객센터
+                FAQ
               </button>
             </div>
 
@@ -110,25 +104,11 @@ const MainLayout = () => {
                       </div>
                       <div className="py-1">
                         <button
-                          onClick={() => handleMenuClick('내 정보 관리')}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
-                        >
-                          <User className="w-4 h-4 mr-3" />
-                          내 정보 관리
-                        </button>
-                        <button
                           onClick={() => handleMenuClick('내 요금제 현황')}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
                         >
                           <Smartphone className="w-4 h-4 mr-3" />
                           내 요금제 현황
-                        </button>
-                        <button
-                          onClick={() => handleMenuClick('관심 요금제')}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
-                        >
-                          <Heart className="w-4 h-4 mr-3" />
-                          관심 요금제
                         </button>
                         <div className="border-t border-pink-100 my-1"></div>
                         <button
