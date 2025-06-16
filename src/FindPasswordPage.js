@@ -91,9 +91,7 @@ const PasswordResetPage = () => {
 
         if (!formData.newPassword) {
             newErrors.newPassword = '새 비밀번호를 입력해주세요';
-        } else if (formData.newPassword.length < 6) {
-            newErrors.newPassword = '비밀번호는 최소 6자 이상이어야 합니다';
-        }
+        } 
 
         if (!formData.confirmPassword) {
             newErrors.confirmPassword = '비밀번호 확인을 입력해주세요';
