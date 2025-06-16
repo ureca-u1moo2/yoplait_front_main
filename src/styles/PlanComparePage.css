@@ -1,0 +1,507 @@
+/* PlanComparePage.css - 메이드카페 핑크 테마 */
+
+/* 메인 컨테이너 */
+.compare-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
+  background: transparent;
+  position: relative;
+}
+
+/* 장식용 배경 요소들 */
+.compare-page-container::before {
+  content: '💖';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+.compare-page-container::after {
+  content: '✨';
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1.5rem;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 페이지 헤더 */
+.compare-page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.compare-page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #ec4899, #f472b6, #be185d, #db2777);
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(236, 72, 153, 0.3);
+  animation: gradient-shift 3s ease-in-out infinite;
+  position: relative;
+}
+
+.compare-page-title::before {
+  content: '⚖️';
+  position: absolute;
+  left: -50px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f472b6;
+  font-size: 1.8rem;
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+.compare-page-title::after {
+  content: '💝';
+  position: absolute;
+  right: -50px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f472b6;
+  font-size: 1.5rem;
+  animation: heartbeat 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.2); }
+}
+
+.compare-page-subtitle {
+  color: #be185d;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* 내 요금제 추가 카드 */
+.maid-user-plan-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 231, 243, 0.8));
+  border: 2px solid #f472b6;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.15),
+    0 0 0 1px rgba(244, 114, 182, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-user-plan-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.user-plan-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  color: #be185d;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.user-plan-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.maid-user-select {
+  background: white;
+  border: 2px solid #f9a8d4;
+  border-radius: 15px;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  color: #be185d;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.maid-user-select:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
+}
+
+.maid-add-btn {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  border: none;
+  border-radius: 20px;
+  padding: 0.7rem 1.5rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 15px rgba(244, 114, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-add-btn::before {
+  content: '➕';
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.maid-add-btn:hover:not(:disabled) {
+  background: linear-gradient(45deg, #db2777, #ec4899);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(244, 114, 182, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.maid-add-btn:hover:not(:disabled)::before {
+  left: 8px;
+}
+
+.maid-add-btn:disabled {
+  background: linear-gradient(45deg, #fce7f3, #f3e8ff);
+  color: #be185d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 비교 그리드 */
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* 비교용 요금제 카드 */
+.maid-compare-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 231, 243, 0.9));
+  border: 2px solid #f9a8d4;
+  border-radius: 20px;
+  padding: 2rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.1),
+    0 0 0 1px rgba(244, 114, 182, 0.05);
+  cursor: pointer;
+}
+
+.maid-compare-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transition: all 0.6s ease;
+}
+
+.maid-compare-card:hover {
+  border-color: #ec4899;
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(244, 114, 182, 0.25),
+    0 0 0 1px rgba(244, 114, 182, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.maid-compare-card:hover::before {
+  left: 100%;
+}
+
+/* 내 요금제 표시 */
+.maid-compare-card.is-my-plan {
+  border-color: #10b981;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(220, 252, 231, 0.8));
+}
+
+.maid-compare-card.is-my-plan::after {
+  content: '내 요금제 💚';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(45deg, #10b981, #34d399);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* 요금제 헤더 */
+.compare-card-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(244, 114, 182, 0.2);
+  position: relative;
+}
+
+.compare-plan-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #be185d, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 0.5rem 0;
+  position: relative;
+}
+
+.compare-plan-name::after {
+  content: '🎀';
+  position: absolute;
+  right: -30px;
+  top: 0;
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.maid-compare-card:hover .compare-plan-name::after {
+  opacity: 1;
+  right: -25px;
+}
+
+.compare-price-tag {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 25px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  box-shadow: 
+    0 4px 15px rgba(244, 114, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+/* 요금제 정보 그리드 */
+.compare-plan-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.compare-info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(252, 231, 243, 0.5);
+  border-radius: 15px;
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  transition: all 0.3s ease;
+}
+
+.compare-info-item:hover {
+  background: rgba(244, 114, 182, 0.1);
+  border-color: #f472b6;
+  transform: translateX(5px);
+}
+
+.compare-info-icon {
+  color: #ec4899;
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+}
+
+.compare-info-content {
+  flex: 1;
+}
+
+.compare-info-label {
+  font-size: 0.85rem;
+  color: #be185d;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.compare-info-value {
+  font-size: 1.1rem;
+  color: #831843;
+  font-weight: 600;
+}
+
+/* 빈 상태 */
+.maid-compare-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 231, 243, 0.8));
+  border: 2px dashed #f472b6;
+  border-radius: 20px;
+  color: #be185d;
+  grid-column: 1 / -1;
+}
+
+.compare-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
+}
+
+.compare-empty-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.compare-empty-subtitle {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.maid-back-btn {
+  background: linear-gradient(45deg, #f472b6, #ec4899);
+  border: none;
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+.maid-back-btn:hover {
+  background: linear-gradient(45deg, #ec4899, #db2777);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 114, 182, 0.4);
+}
+
+/* 로딩 상태 */
+.maid-loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 1.2rem;
+  color: #be185d;
+  font-weight: 500;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .compare-page-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .compare-page-title {
+    font-size: 2rem;
+  }
+  
+  .compare-page-title::before,
+  .compare-page-title::after {
+    display: none;
+  }
+  
+  .compare-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .maid-user-plan-card {
+    padding: 1.5rem;
+  }
+  
+  .user-plan-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .maid-user-select {
+    min-width: auto;
+  }
+}
+
+/* 추가 장식 요소들 */
+.compare-decoration-1 {
+  position: absolute;
+  top: 15%;
+  left: 3%;
+  font-size: 1.5rem;
+  opacity: 0.2;
+  animation: float 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.compare-decoration-2 {
+  position: absolute;
+  top: 25%;
+  right: 5%;
+  font-size: 1.2rem;
+  opacity: 0.2;
+  animation: float 3.5s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+.compare-decoration-3 {
+  position: absolute;
+  bottom: 30%;
+  left: 2%;
+  font-size: 1rem;
+  opacity: 0.2;
+  animation: float 5s ease-in-out infinite;
+  pointer-events: none;
+}

@@ -1,0 +1,549 @@
+/* PlanReviewSection.css - 메이드카페 핑크 테마 */
+
+/* 메인 리뷰 섹션 컨테이너 */
+.maid-review-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 231, 243, 0.9));
+  border: 2px solid #f9a8d4;
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.15),
+    0 0 0 1px rgba(244, 114, 182, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-review-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* 리뷰 섹션 헤더 */
+.maid-review-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.maid-review-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #ec4899, #f472b6, #be185d);
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 0.5rem 0;
+  animation: gradient-shift 3s ease-in-out infinite;
+  position: relative;
+}
+
+.maid-review-title::before {
+  content: '⭐';
+  position: absolute;
+  left: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f472b6;
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.maid-review-title::after {
+  content: '⭐';
+  position: absolute;
+  right: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f472b6;
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: translateY(-50%) scale(1) rotate(0deg); }
+  50% { transform: translateY(-50%) scale(1.2) rotate(180deg); }
+}
+
+/* 빈 리뷰 상태 */
+.maid-empty-reviews {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, rgba(252, 231, 243, 0.5), rgba(255, 255, 255, 0.8));
+  border: 2px dashed #f472b6;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.maid-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.maid-empty-text {
+  color: #be185d;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  font-style: italic;
+}
+
+/* 개별 리뷰 카드 */
+.maid-review-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 231, 243, 0.8));
+  border: 2px solid #f9a8d4;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.maid-review-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transition: all 0.6s ease;
+}
+
+.maid-review-card:hover {
+  border-color: #ec4899;
+  transform: translateY(-3px);
+  box-shadow: 
+    0 15px 35px rgba(244, 114, 182, 0.2),
+    0 0 0 1px rgba(244, 114, 182, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.maid-review-card:hover::before {
+  left: 100%;
+}
+
+/* 리뷰 평점 */
+.maid-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.maid-rating-label {
+  color: #be185d;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.maid-rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.maid-star {
+  color: #f472b6;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(244, 114, 182, 0.3));
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* 리뷰 내용 */
+.maid-review-content {
+  color: #be185d;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(252, 231, 243, 0.3);
+  border-radius: 10px;
+  border-left: 4px solid #f472b6;
+  position: relative;
+}
+
+.maid-review-content::before {
+  content: '"';
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  font-size: 2rem;
+  color: #f472b6;
+  opacity: 0.5;
+  font-family: serif;
+}
+
+.maid-review-content::after {
+  content: '"';
+  position: absolute;
+  bottom: -15px;
+  right: 10px;
+  font-size: 2rem;
+  color: #f472b6;
+  opacity: 0.5;
+  font-family: serif;
+}
+
+/* 리뷰 액션 버튼들 */
+.maid-review-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.maid-action-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-edit-btn {
+  background: linear-gradient(45deg, #a855f7, #c084fc);
+  color: white;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.maid-edit-btn:hover {
+  background: linear-gradient(45deg, #9333ea, #a855f7);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
+}
+
+.maid-save-btn {
+  background: linear-gradient(45deg, #10b981, #34d399);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.maid-save-btn:hover {
+  background: linear-gradient(45deg, #059669, #10b981);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.maid-cancel-btn {
+  background: linear-gradient(45deg, #64748b, #94a3b8);
+  color: white;
+  box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
+}
+
+.maid-cancel-btn:hover {
+  background: linear-gradient(45deg, #475569, #64748b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
+}
+
+.maid-delete-btn {
+  background: linear-gradient(45deg, #ef4444, #f87171);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.maid-delete-btn:hover {
+  background: linear-gradient(45deg, #dc2626, #ef4444);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* 편집 모드 입력 필드들 */
+.maid-edit-form {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  border: 2px solid #f472b6;
+}
+
+.maid-edit-input {
+  width: 100%;
+  background: white;
+  border: 2px solid #f9a8d4;
+  border-radius: 10px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  color: #be185d;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.maid-edit-input:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 
+    0 0 0 3px rgba(244, 114, 182, 0.2),
+    0 4px 12px rgba(244, 114, 182, 0.3);
+  transform: translateY(-1px);
+}
+
+.maid-edit-input::placeholder {
+  color: #f472b6;
+  font-style: italic;
+}
+
+.maid-rating-select {
+  background: white;
+  border: 2px solid #f9a8d4;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  color: #be185d;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.maid-rating-select:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
+}
+
+/* 새 리뷰 작성 섹션 */
+.maid-new-review-section {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 231, 243, 0.8));
+  border: 2px solid #f472b6;
+  border-radius: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.maid-new-review-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #be185d;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.maid-new-review-title::before {
+  content: '✨';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.maid-new-review-title::after {
+  content: '✨';
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  animation: sparkle 2s ease-in-out infinite 1s;
+}
+
+.maid-new-review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.maid-review-textarea {
+  width: 100%;
+  background: white;
+  border: 2px solid #f9a8d4;
+  border-radius: 15px;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #be185d;
+  min-height: 120px;
+  resize: vertical;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.maid-review-textarea:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 
+    0 0 0 4px rgba(244, 114, 182, 0.2),
+    0 6px 20px rgba(244, 114, 182, 0.3);
+  transform: translateY(-2px);
+}
+
+.maid-review-textarea::placeholder {
+  color: #f472b6;
+  font-style: italic;
+}
+
+.maid-form-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.maid-rating-group {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.maid-rating-label-new {
+  color: #be185d;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.maid-submit-btn {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  border: none;
+  border-radius: 25px;
+  padding: 1rem 2rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 6px 20px rgba(244, 114, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-submit-btn::before {
+  content: '💕';
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.maid-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(45deg, #db2777, #ec4899);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.maid-submit-btn:hover:not(:disabled)::before {
+  left: 15px;
+}
+
+.maid-submit-btn:disabled {
+  background: linear-gradient(45deg, #fce7f3, #f3e8ff);
+  color: #be185d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .maid-review-section {
+    padding: 1.5rem;
+  }
+  
+  .maid-review-title::before,
+  .maid-review-title::after {
+    display: none;
+  }
+  
+  .maid-new-review-title::before,
+  .maid-new-review-title::after {
+    display: none;
+  }
+  
+  .maid-form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .maid-rating-group {
+    justify-content: center;
+  }
+  
+  .maid-review-actions {
+    justify-content: center;
+  }
+  
+  .maid-action-btn {
+    flex: 1;
+    min-width: 80px;
+  }
+}
+
+/* 추가 애니메이션 효과 */
+.maid-review-card.editing {
+  border-color: #a855f7;
+  box-shadow: 
+    0 0 0 2px rgba(168, 85, 247, 0.2),
+    0 10px 30px rgba(168, 85, 247, 0.3);
+}
+
+/* 로딩 상태 */
+.maid-loading {
+  text-align: center;
+  padding: 3rem;
+  color: #be185d;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.maid-loading::before {
+  content: '💫';
+  margin-right: 0.5rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

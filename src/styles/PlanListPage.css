@@ -1,0 +1,679 @@
+/* styles/pages/PlanListPage.css
+
+.plan-list-container {
+  padding: 1rem;
+}
+
+.plan-list-controls {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  padding: 1rem 0;
+  z-index: 1000;
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.plan-list {
+  margin-top: 1rem;
+}
+
+.plan-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.plan-link {
+  cursor: pointer;
+  margin-left: 0.5rem;
+  display: inline-block;
+} */
+
+
+/* PlanListPage.css - 메이드카페 핑크 테마 */
+
+/* 메인 컨테이너 */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: rgba(253, 242, 248, 0.3);
+}
+
+.plan-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
+  /* background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f3e8ff 100%); */
+  /* background: rgba(253, 242, 248, 0.3); */
+  background: transparent;
+  position: relative;
+}
+
+/* 장식용 배경 요소들 */
+.plan-page-container::before {
+  content: '🌸';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+.plan-page-container::after {
+  content: '💕';
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1.5rem;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 페이지 헤더 - 메이드카페 스타일 */
+.maid-page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.maid-page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #ec4899, #f472b6, #be185d, #db2777);
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(236, 72, 153, 0.3);
+  animation: gradient-shift 3s ease-in-out infinite;
+  position: relative;
+}
+
+.maid-page-title::before {
+  content: '♡';
+  position: absolute;
+  left: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f472b6;
+  font-size: 1.5rem;
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+.maid-page-title::after {
+  content: '♡';
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f472b6;
+  font-size: 1.5rem;
+  animation: heartbeat 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.2); }
+}
+
+.maid-page-subtitle {
+  color: #be185d;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* 검색 및 필터 카드 - 메이드 스타일 */
+.maid-search-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 231, 243, 0.8));
+  border: 2px solid #f472b6;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.15),
+    0 0 0 1px rgba(244, 114, 182, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-search-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* 검색 입력 필드 */
+.maid-search-input {
+  background: white;
+  border: 2px solid #f9a8d4;
+  border-radius: 25px;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(244, 114, 182, 0.1);
+}
+
+.maid-search-input:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 
+    inset 0 2px 4px rgba(244, 114, 182, 0.1),
+    0 0 0 4px rgba(244, 114, 182, 0.2),
+    0 4px 12px rgba(244, 114, 182, 0.3);
+  transform: translateY(-1px);
+}
+
+.maid-search-input::placeholder {
+  color: #f472b6;
+  font-style: italic;
+}
+
+/* 필터 선택 박스들 */
+.maid-select {
+  background: white;
+  border: 2px solid #f9a8d4;
+  border-radius: 15px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  color: #be185d;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.maid-select:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
+}
+
+.maid-select option {
+  background: white;
+  color: #be185d;
+  padding: 0.5rem;
+}
+
+/* 비교 버튼 - 메이드 스페셜 */
+.maid-compare-btn {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem 2rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 15px rgba(244, 114, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.maid-compare-btn::before {
+  content: '✨';
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.maid-compare-btn:hover:not(:disabled) {
+  background: linear-gradient(45deg, #db2777, #ec4899);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(244, 114, 182, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.maid-compare-btn:hover:not(:disabled)::before {
+  left: 10px;
+}
+
+.maid-compare-btn:disabled {
+  background: linear-gradient(45deg, #fce7f3, #f3e8ff);
+  color: #be185d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 요금제 카드들 - 메이드카페 컨셉 */
+.maid-plan-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 231, 243, 0.9));
+  border: 2px solid #f9a8d4;
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 8px 25px rgba(244, 114, 182, 0.1),
+    0 0 0 1px rgba(244, 114, 182, 0.05);
+}
+
+.maid-plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.1), transparent);
+  transition: all 0.6s ease;
+}
+
+.maid-plan-card:hover {
+  border-color: #ec4899;
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(244, 114, 182, 0.25),
+    0 0 0 1px rgba(244, 114, 182, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.maid-plan-card:hover::before {
+  left: 100%;
+}
+
+/* 체크박스 - 하트 모양 */
+.maid-checkbox {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #f472b6;
+  border-radius: 50%;
+  background: white;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.25rem;
+}
+
+.maid-checkbox::before {
+  content: '♡';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #f472b6;
+  font-size: 14px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.maid-checkbox:checked {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  border-color: #ec4899;
+  box-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
+}
+
+.maid-checkbox:checked::before {
+  content: '♥';
+  color: white;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* 요금제 정보 영역 */
+.maid-plan-content {
+  flex: 1;
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.maid-plan-content:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(252, 231, 243, 0.6));
+  transform: translateX(5px);
+}
+
+.maid-plan-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #be185d, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 1rem 0;
+  position: relative;
+}
+
+.maid-plan-name::after {
+  content: '🎀';
+  position: absolute;
+  right: -30px;
+  top: 0;
+  font-size: 1rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.maid-plan-content:hover .maid-plan-name::after {
+  opacity: 1;
+  right: -25px;
+}
+
+/* 가격 표시 - 특별 스타일 */
+.maid-price-tag {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-shadow: 
+    0 4px 15px rgba(244, 114, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  display: inline-block;
+}
+
+/* .maid-price-tag::before {
+  content: '💰';
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+} */
+
+/* 하트 버튼 */
+.maid-heart-btn {
+  background: none;
+  border: none;
+  color: #f472b6;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.maid-heart-btn:hover {
+  background: rgba(244, 114, 182, 0.1);
+  transform: scale(1.2);
+  color: #ec4899;
+}
+
+.maid-heart-btn::after {
+  content: '💕';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.maid-heart-btn:hover::after {
+  opacity: 1;
+  top: -15px;
+}
+
+/* 요금제 정보 그리드 */
+.maid-plan-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.maid-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #be185d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: rgba(252, 231, 243, 0.5);
+  padding: 0.5rem 0.8rem;
+  border-radius: 15px;
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  transition: all 0.3s ease;
+}
+
+.maid-info-item:hover {
+  background: rgba(244, 114, 182, 0.1);
+  border-color: #f472b6;
+  transform: translateY(-2px);
+}
+
+.maid-info-item .emoji {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 1px 2px rgba(244, 114, 182, 0.3));
+}
+
+/* 통신사 정보 */
+.maid-carrier-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(244, 114, 182, 0.2);
+  color: #be185d;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.maid-carrier-info::before {
+  content: '📡';
+  font-size: 1rem;
+}
+
+/* 플로팅 비교 버튼 */
+.maid-floating-compare {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, #ec4899, #f472b6, #be185d);
+  background-size: 200% 200%;
+  animation: gradient-float 3s ease-in-out infinite;
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 25px;
+  box-shadow: 
+    0 10px 30px rgba(244, 114, 182, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes gradient-float {
+  0%, 100% { 
+    background-position: 0% 50%;
+    transform: translateY(0px);
+  }
+  50% { 
+    background-position: 100% 50%;
+    transform: translateY(-5px);
+  }
+}
+
+.maid-floating-compare::before {
+  content: '✨';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.5rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.1); }
+  50% { transform: rotate(180deg) scale(0.9); }
+  75% { transform: rotate(270deg) scale(1.1); }
+}
+
+.maid-floating-info {
+  margin-bottom: 0.8rem;
+}
+
+.maid-floating-main {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.maid-floating-sub {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* 빈 상태 메시지 */
+.maid-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 231, 243, 0.8));
+  border: 2px dashed #f472b6;
+  border-radius: 20px;
+  color: #be185d;
+}
+
+.maid-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
+}
+
+.maid-empty-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.maid-reset-btn {
+  background: linear-gradient(45deg, #f472b6, #ec4899);
+  border: none;
+  color: white;
+  padding: 0.7rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.maid-reset-btn:hover {
+  background: linear-gradient(45deg, #ec4899, #db2777);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 114, 182, 0.4);
+}
+
+/* 결과 요약 */
+.maid-summary {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(252, 231, 243, 0.6));
+  border-radius: 15px;
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  color: #be185d;
+  font-weight: 500;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .maid-page-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .maid-page-title {
+    font-size: 2rem;
+  }
+  
+  .maid-page-title::before,
+  .maid-page-title::after {
+    display: none;
+  }
+  
+  .maid-search-card {
+    padding: 1.5rem;
+  }
+  
+  .maid-plan-info {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .maid-floating-compare {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* 추가 장식 요소들 */
+.maid-decoration-1 {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  font-size: 1.5rem;
+  opacity: 0.2;
+  animation: float 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.maid-decoration-2 {
+  position: absolute;
+  top: 30%;
+  right: 10%;
+  font-size: 1.2rem;
+  opacity: 0.2;
+  animation: float 3.5s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+.maid-decoration-3 {
+  position: absolute;
+  bottom: 40%;
+  left: 8%;
+  font-size: 1rem;
+  opacity: 0.2;
+  animation: float 5s ease-in-out infinite;
+  pointer-events: none;
+}
