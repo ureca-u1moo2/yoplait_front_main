@@ -440,3 +440,83 @@
   animation: float 3.5s ease-in-out infinite reverse;
   pointer-events: none;
 }
+
+/* 사이드 메뉴 스타일 */
+.mypage-sidebar {
+  width: 220px;
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  border-right: 2px dashed #f472b6;
+  padding: 2rem 1rem;
+  border-radius: 20px 0 0 20px;
+  box-shadow: 4px 0 15px rgba(236, 72, 153, 0.1);
+}
+
+.mypage-menu-item {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #be185d;
+  background: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 15px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.mypage-menu-item:hover {
+  background: #f9a8d4;
+  color: white;
+  border-color: #ec4899;
+  box-shadow: 0 4px 12px rgba(244, 114, 182, 0.3);
+}
+
+.mypage-menu-item.active {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  color: white;
+  border: 2px solid #be185d;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+}
+
+/* 콘텐츠 영역 정렬 */
+.mypage-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.mypage-content {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: inset 0 1px 3px rgba(244, 114, 182, 0.1);
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+  .mypage-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .mypage-sidebar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-right: none;
+    border-bottom: 2px dashed #f472b6;
+    border-radius: 20px 20px 0 0;
+    padding: 1rem;
+  }
+
+  .mypage-menu-item {
+    flex: 1;
+    margin: 0 0.5rem;
+  }
+
+  .mypage-content {
+    padding: 1rem;
+  }
+}
