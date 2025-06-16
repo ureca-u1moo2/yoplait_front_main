@@ -90,7 +90,8 @@ const TelecomMainPage = () => {
               popular: index === 1, // 두번째 요금제를 인기 요금제로 설정
               emoji: getEmoji(index),
               company: "LG U+",
-              createdAt: plan.createdAt
+              createdAt: plan.createdAt,
+              tags: plan.tags || [] // 태그 정보 추가
             }));
             
             setPopularPlans(transformedPlans);
@@ -215,7 +216,11 @@ const TelecomMainPage = () => {
       popular: false,
       emoji: "🥛",
       company: "LG U+",
-      description: "기본 요금제"
+      description: "기본 요금제",
+      tags: [
+        { id: "tag1", tagName: "5G" },
+        { id: "tag2", tagName: "경제형" }
+      ]
     },
     {
       id: "fallback-2", 
@@ -227,7 +232,11 @@ const TelecomMainPage = () => {
       popular: true,
       emoji: "🍓",
       company: "LG U+",
-      description: "인기 요금제"
+      description: "인기 요금제",
+      tags: [
+        { id: "tag3", tagName: "5G" },
+        { id: "tag4", tagName: "대용량" }
+      ]
     },
     {
       id: "fallback-3",
@@ -239,7 +248,12 @@ const TelecomMainPage = () => {
       popular: false,
       emoji: "👑",
       company: "LG U+",
-      description: "프리미엄 요금제"
+      description: "프리미엄 요금제",
+      tags: [
+        { id: "tag5", tagName: "프리미엄" },
+        { id: "tag6", tagName: "대용량" },
+        { id: "tag7", tagName: "5G" }
+      ]
     }
   ];
 
@@ -606,6 +620,24 @@ const TelecomMainPage = () => {
                     <div className="text-4xl mb-3">{plan.emoji}</div>
                     <div className="text-xs font-medium text-gray-500 mb-1">{plan.company}</div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                    
+                    {/* 태그 표시 영역 */}
+                    {plan.tags && plan.tags.length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-1 mb-3">
+                        {plan.tags.slice(0, 3).map((tag, tagIndex) => (
+                          <span 
+                            key={tag.id || tagIndex}
+                            className="text-xs px-2 py-1 bg-gradient-to-r from-pink-100 to-rose-100 text-pink-600 rounded-full border border-pink-200"
+                          >
+                            {tag.tagName}
+                          </span>
+                        ))}
+                        {plan.tags.length > 3 && (
+                          <span className="text-xs text-gray-400">+{plan.tags.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+                    
                     <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent mb-6">
                       {plan.price}<span className="text-lg text-gray-500">/월</span>
                     </div>
