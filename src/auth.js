@@ -74,7 +74,7 @@ export const apiClient = {
     const defaultOptions = {
       headers: {
         'Content-Type': 'application/json',
-        ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
+        ...(accessToken && { 'X-AUTH-TOKEN': accessToken }),
         ...options.headers
       },
       ...options
@@ -87,7 +87,7 @@ export const apiClient = {
       if (response.status === 401) {
         const newToken = await refreshAccessToken();
         if (newToken) {
-          defaultOptions.headers['Authorization'] = `Bearer ${newToken}`;
+          defaultOptions.headers['X-AUTH-TOKEN'] = newToken;
           response = await fetch(url, defaultOptions);
         } else {
           // 리프레시 실패시 로그아웃 처리
@@ -119,6 +119,7 @@ const refreshAccessToken = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-REFRESH-TOKEN': refreshToken
       },
       body: JSON.stringify({
         refreshToken: refreshToken
@@ -127,9 +128,10 @@ const refreshAccessToken = async () => {
     
     const data = await response.json();
     
-    if (data.result === 'SUCCESS' && data.data.accessToken) {
-      tokenManager.setAccessToken(data.data.accessToken);
-      return data.data.accessToken;
+    if (data.result === 'SUCCESS' && data.data.token) {
+      tokenManager.setAccessToken(data.data.token.accessToken);
+      tokenManager.setRefreshToken(data.data.token.refreshToken); 
+      return data.data.token.accessToken;
     }
     
     return null;
@@ -168,7 +170,8 @@ export const handleLogout = async () => {
 
 // 로그인 리다이렉트 처리
 export const handleLoginSuccess = (loginResponse) => {
-  const { accessToken, refreshToken, userDto } = loginResponse.data;
+  const { accessToken, refreshToken } = loginResponse.data.token;
+  const { userDto } = loginResponse.data;
   
   // 토큰 저장
   if (accessToken) {
