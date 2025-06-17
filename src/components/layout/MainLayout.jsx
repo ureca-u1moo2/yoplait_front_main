@@ -1,13 +1,13 @@
-// 요금제 목록/상세/비교/마이페이지 메뉴 동일
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Smartphone, MessageCircle } from 'lucide-react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { User, LogOut, Smartphone, MessageCircle, CheckCircle, X, AlertCircle } from 'lucide-react';
 import { userManager, handleLogout } from '../../auth';
 
 const MainLayout = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,10 +16,22 @@ const MainLayout = () => {
     setUserInfo(user);
   }, []);
 
+  // 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserMenu && !event.target.closest('.user-menu-container')) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showUserMenu]);
+
   const handleLogoutClick = () => {
     handleLogout();
     setIsLoggedIn(false);
     setShowUserMenu(false);
+    showNotification('success', '로그아웃되었습니다.');
     navigate('/login');
   };
 
@@ -29,30 +41,73 @@ const MainLayout = () => {
 
   const handleMenuClick = (menu) => {
     setShowUserMenu(false);
-    switch (menu) {
-      case '내 요금제 현황':
-        navigate('/mypage');
-        break;
-      default:
-        break;
-    }
+    if (menu === '내 요금제 현황') navigate('/mypage');
+  };
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  const closeNotification = () => {
+    setNotification(null);
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-white">
+      {/* Notification */}
+      {notification && (
+        <div className="fixed top-4 right-4 z-50 max-w-sm w-full">
+          <div className={`rounded-2xl shadow-2xl p-4 border-l-4 backdrop-blur-sm transform transition-all duration-300 ${
+            notification.type === 'success' 
+              ? 'bg-green-50/90 border-green-400 text-green-800'
+              : notification.type === 'error'
+              ? 'bg-red-50/90 border-red-400 text-red-800'
+              : 'bg-blue-50/90 border-blue-400 text-blue-800'
+          }`}>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                {notification.type === 'success' ? (
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : notification.type === 'error' ? (
+                  <X className="w-5 h-5 text-red-400" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-blue-400" />
+                )}
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium">{notification.message}</p>
+              </div>
+              <button onClick={closeNotification} className="ml-4 text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b border-pink-100">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center">
+            {/* 로고 */}
+            <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
               <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-lg">🍓</span>
+                {/* <span className="text-white font-bold text-lg">🍓</span> */}
+                {/* 로고 이미지로 교체 */}
+                <img 
+                  src="/assets/Yoplait.png" // 👉 여기에 실제 이미지 경로
+                  alt="로고"
+                  className="w-10 h-10 rounded-full object-cover mr-3 shadow-sm"
+                />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
                 요플레
               </span>
               <span className="text-sm text-pink-400 ml-2">요금 플래너</span>
-            </Link>
+            </div>
 
+            {/* 메뉴 */}
             <div className="hidden md:flex space-x-8">
               <button 
                 onClick={() => navigate('/plans')}
@@ -61,13 +116,14 @@ const MainLayout = () => {
                 요금제 목록
               </button>
               <button 
-                onClick={() => navigate('/FAQ')}
+                onClick={() => navigate('/faq')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 FAQ
               </button>
             </div>
 
+            {/* 로그인/유저 메뉴 */}
             <div className="flex items-center space-x-4">
               {isLoggedIn ? (
                 <div className="relative user-menu-container">
@@ -132,15 +188,16 @@ const MainLayout = () => {
         </nav>
       </header>
 
-      <main>
+      {/* 본문 영역 */}
+      <main className="pt-8 pb-20 px-4 sm:px-6 lg:px-8">
         <Outlet />
       </main>
 
-      {/* 챗봇 아이콘 - 우측 하단 고정 */}
+      {/* 챗봇 버튼 */}
       {window.location.pathname !== '/chatbot' && (
         <div className="fixed bottom-6 right-6 z-50">
           <button 
-            onClick={() => window.location.href = '/chatbot'}
+            onClick={() => navigate('/chatbot')}
             className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group"
           >
             <MessageCircle className="w-7 h-7 text-white group-hover:animate-pulse" />
