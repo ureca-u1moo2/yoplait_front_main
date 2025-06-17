@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Send, X } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { MessageCircle, Send, X, ArrowLeft, Lock } from 'lucide-react';
+import { userManager } from '../auth';
+import { useNavigate } from 'react-router-dom';
 import 'styles/ChatbotPage.css'; // 전용 CSS 파일 import
 
 const ChatbotPage = () => {
@@ -10,8 +12,13 @@ const ChatbotPage = () => {
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [hasActiveButtons, setHasActiveButtons] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const [authError, setAuthError] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false); // 초기화 상태 추가
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   // 스크롤을 맨 아래로 이동하는 함수
   const scrollToBottom = () => {
@@ -25,18 +32,28 @@ const ChatbotPage = () => {
     scrollToBottom();
   }, [conversations, waitingMessage, isWaitingForMainReply, loading]);
 
+  // 로그인 상태 확인
   useEffect(() => {
-    const newSessionId = crypto.randomUUID();
-    setSessionId(newSessionId);
-    console.log('🆕 생성된 sessionId:', newSessionId);
-
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = '';
+    const checkLoginStatus = () => {
+      try {
+        const loggedIn = userManager.isLoggedIn();
+        const user = userManager.getUserInfo();
+        
+        setIsLoggedIn(loggedIn);
+        setUserInfo(user);
+        
+        if (!loggedIn) {
+          setAuthError(true);
+        }
+      } catch (error) {
+        console.error('로그인 상태 확인 중 오류:', error);
+        setIsLoggedIn(false);
+        setUserInfo(null);
+        setAuthError(true);
+      }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    checkLoginStatus();
   }, []);
 
   // updateCurrentConversation 함수
@@ -85,8 +102,25 @@ const ChatbotPage = () => {
     }
   };
 
-  // 공통 메시지 전송 함수
-  const sendMessage = async (userMessage, additionalData = {}) => {
+  // 인증 토큰 가져오기 함수
+  const getAuthToken = () => {
+    return localStorage.getItem('accessToken');
+  };
+
+  // 공통 메시지 전송 함수 (인증 헤더 추가)
+  const sendMessage = useCallback(async (userMessage, additionalData = {}) => {
+    if (!isLoggedIn) {
+      setAuthError(true);
+      return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+      console.error('인증 토큰이 없습니다.');
+      setAuthError(true);
+      return;
+    }
+
     const newConversation = {
       id: Date.now(),
       userMessage: userMessage,
@@ -115,9 +149,26 @@ const ChatbotPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-AUTH-TOKEN': token, // 인증 헤더 추가
         },
         body: JSON.stringify(requestBody),
       });
+
+      if (response.status === 401) {
+        // 인증 실패
+        console.error('인증 실패: 토큰이 유효하지 않습니다.');
+        setAuthError(true);
+        setConversations(prev => prev.map(conv => 
+          conv.id === newConversation.id 
+            ? { 
+                ...conv, 
+                botMessages: ['❌ 인증이 만료되었습니다. 다시 로그인해주세요.'],
+                hasError: true 
+              }
+            : conv
+        ));
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -177,10 +228,43 @@ const ChatbotPage = () => {
       setWaitingMessage('');
       setIsWaitingForMainReply(false);
     }
-  };
+  }, [isLoggedIn, sessionId]);
+
+  // 세션 ID 생성 및 URL 파라미터 처리 (로그인된 경우에만)
+  useEffect(() => {
+    if (isLoggedIn && !isInitialized) {
+      const newSessionId = crypto.randomUUID();
+      setSessionId(newSessionId);
+      setIsInitialized(true); // 초기화 완료 표시
+      console.log('🆕 생성된 sessionId:', newSessionId);
+
+      // URL 파라미터에서 메시지 확인하고 자동 전송
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialMessage = urlParams.get('message');
+      
+      if (initialMessage) {
+        // URL에서 message 파라미터 제거 (브라우저 히스토리 업데이트)
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+        
+        // 약간의 지연 후 메시지 자동 전송
+        setTimeout(() => {
+          sendMessage(decodeURIComponent(initialMessage));
+        }, 1000);
+      }
+
+      const handleBeforeUnload = (e) => {
+        e.preventDefault();
+        e.returnValue = '';
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  }, [isLoggedIn, isInitialized, sendMessage]); // isInitialized 추가
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !isLoggedIn) return;
     const userMessage = input.trim();
     setInput('');
     await sendMessage(userMessage);
@@ -231,7 +315,7 @@ const ChatbotPage = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !loading && input.trim()) {
+    if (e.key === 'Enter' && !loading && input.trim() && isLoggedIn) {
       handleSend();
     }
   };
@@ -268,6 +352,48 @@ const ChatbotPage = () => {
       </span>
     );
   };
+
+  // 로그인 필요 화면
+  if (authError || !isLoggedIn) {
+    return (
+      <div className="chatbot-page-container">
+        <div className="chatbot-main-container">
+          <div className="chatbot-auth-required">
+            <div className="chatbot-auth-icon">
+              <Lock className="w-16 h-16 text-pink-400" />
+            </div>
+            <h1 className="chatbot-auth-title">로그인이 필요합니다</h1>
+            <p className="chatbot-auth-description">
+              AI 챗봇 서비스는 로그인한 사용자만 이용할 수 있습니다.<br/>
+              개인 맞춤 상담을 위해 로그인해주세요.
+            </p>
+            <div className="chatbot-auth-buttons">
+              <button 
+                onClick={() => navigate('/login')}
+                className="chatbot-auth-login"
+              >
+                로그인하기
+              </button>
+              <button 
+                onClick={() => navigate('/')}
+                className="chatbot-auth-home"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                홈으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Background Elements */}
+        <div className="chatbot-bg-element chatbot-bg-1"></div>
+        <div className="chatbot-bg-element chatbot-bg-2"></div>
+        <div className="chatbot-bg-element chatbot-bg-3"></div>
+        <div className="chatbot-bg-emoji chatbot-bg-emoji-1">🍓</div>
+        <div className="chatbot-bg-emoji chatbot-bg-emoji-2">🥛</div>
+      </div>
+    );
+  }
 
   // 메시지 렌더링
   const renderMessage = (content, isUser, key) => {
@@ -430,7 +556,7 @@ const ChatbotPage = () => {
   return (
     <div className="chatbot-page-container">
       {/* Chat Container */}
-      <div className="chatbot-main-container">
+      <div className="chatbot-main-container">{/* 기존 내용들... */}
         {/* Welcome Section */}
         <div className="chatbot-welcome-section">
           <div className="chatbot-welcome-icon">
@@ -442,8 +568,9 @@ const ChatbotPage = () => {
             <span className="chatbot-title-highlight">AI 챗봇</span>과 대화하기
           </h1>
           <p className="chatbot-welcome-description">
-            궁금한 요금제나 통신 관련 질문을 자유롭게 물어보세요.<br></br> 
-            AI가 친절하게 답변해드립니다! 🍦
+            안녕하세요, <strong>{userInfo?.name || userInfo?.email?.split('@')[0] || '회원'}님</strong>! 🍦<br/>
+            궁금한 요금제나 통신 관련 질문을 자유롭게 물어보세요.<br/> 
+            AI가 개인 맞춤 상담으로 친절하게 답변해드립니다!
           </p>
         </div>
 
@@ -453,6 +580,29 @@ const ChatbotPage = () => {
             <div className="chatbot-empty-state">
               <div className="chatbot-empty-icon">💬</div>
               <p className="chatbot-empty-text">메시지를 입력하고 전송 버튼을 클릭하세요.</p>
+              <div className="chatbot-suggestions">
+                <p className="chatbot-suggestions-title">💡 이런 질문을 해보세요:</p>
+                <div className="chatbot-suggestions-list">
+                  <button 
+                    onClick={() => setInput("요금제 추천해줘")}
+                    className="chatbot-suggestion-chip"
+                  >
+                    요금제 추천해줘
+                  </button>
+                  <button 
+                    onClick={() => setInput("데이터 많이 쓰는 요금제")}
+                    className="chatbot-suggestion-chip"
+                  >
+                    데이터 많이 쓰는 요금제
+                  </button>
+                  <button 
+                    onClick={() => setInput("전체 요금제 보여줘")}
+                    className="chatbot-suggestion-chip"
+                  >
+                    전체 요금제 보여줘
+                  </button>
+                </div>
+              </div>
               {hasActiveButtons && (
                 <div className="chatbot-waiting-buttons">
                   🔒 버튼 선택 대기 중입니다. 아래의 버튼을 클릭해주세요.
@@ -533,7 +683,7 @@ const ChatbotPage = () => {
 
         {/* Footer Tips */}
         <div className="chatbot-tips">
-          <p>💡 팁: "요금제 추천", "데이터 많이 쓰는 요금제", "가격대별 요금제" 등을 물어보세요!</p>
+          <p>💡 팁: "요금제 추천", "데이터 많이 쓰는 요금제", "전체 요금제" 등을 물어보세요!</p>
         </div>
       </div>
 
