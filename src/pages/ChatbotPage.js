@@ -104,14 +104,14 @@ const ChatbotPage = () => {
 
     try {
       console.log('📤 전송하는 sessionId:', sessionId);
-      
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
       const requestBody = {
         message: userMessage,
         sessionId,
         ...additionalData
       };
 
-      const response = await fetch('http://localhost:8080/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

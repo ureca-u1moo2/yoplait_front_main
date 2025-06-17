@@ -264,22 +264,6 @@ const PasswordResetPage = () => {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="flex justify-center items-center mb-6">
-                        <button
-                            onClick={() => window.location.href = '/'}
-                            className="flex items-center hover:opacity-80 transition-opacity"
-                        >
-                            <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center mr-4">
-                                <span className="text-white font-bold text-2xl">🍓</span>
-                            </div>
-                            <div>
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-                                    요플레
-                                </h1>
-                                <p className="text-sm text-pink-400">요금 플래너</p>
-                            </div>
-                        </button>
-                    </div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">
                         {step === 1 ? '비밀번호 찾기' : step === 2 ? '새 비밀번호 설정' : '완료'}
                     </h2>

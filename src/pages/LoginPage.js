@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, CheckCircle, X, AlertCircle } from 'lucide-react';
-import { userManager, handleLoginSuccess } from './auth';
+import { userManager, handleLoginSuccess } from '../auth';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({

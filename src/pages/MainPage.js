@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Smartphone, DollarSign, Users, User, LogOut, CheckCircle, X, AlertCircle, MessageCircle } from 'lucide-react';
-import { userManager, handleLogout } from './auth';
+import { userManager, handleLogout } from '../auth';
 import { useNavigate } from 'react-router-dom';
 
 const TelecomMainPage = () => {
@@ -78,8 +78,12 @@ const TelecomMainPage = () => {
           const data = await response.json();
           
           if (data.result === 'SUCCESS' && data.data) {
-            // API 데이터를 UI에 맞게 변환
-            const transformedPlans = data.data.slice(0, 3).map((plan, index) => ({
+            const originalPlans = data.data.slice(0, 3);
+            const reorderedPlans = originalPlans.length >= 2 ? 
+              [originalPlans[1], originalPlans[0], originalPlans[2]].filter(Boolean) : 
+              originalPlans;
+            
+            const transformedPlans = reorderedPlans.map((plan, index) => ({
               id: plan.id,
               name: plan.name,
               price: `${plan.price.toLocaleString()}원`,
@@ -87,7 +91,7 @@ const TelecomMainPage = () => {
               voice: formatCallAmount(plan.callAmount),
               message: formatSmsAmount(plan.smsAmount),
               description: plan.description,
-              popular: index === 1, // 두번째 요금제를 인기 요금제로 설정
+              popular: index === 1, 
               emoji: getEmoji(index),
               company: "LG U+",
               createdAt: plan.createdAt,
