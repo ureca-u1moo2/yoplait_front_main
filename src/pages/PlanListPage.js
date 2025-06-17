@@ -33,6 +33,13 @@ function PlanListPage() {
   const [priceRange, setPriceRange] = useState('all');
   const navigate = useNavigate();
 
+    // GB 파싱
+  const formatDataAmount = (amount) => {
+    if (amount === -1) return "무제한";
+    if (amount >= 1024) return `${Math.floor(amount / 1024)}GB`;
+    return `${amount}MB`;
+  };
+
 
   useEffect(() => {
     setIsLoading(true);
@@ -197,7 +204,7 @@ function PlanListPage() {
                       <span style={pinkIconStyle}>
                         <Smartphone size={16} />
                       </span>
-                      <span>데이터: {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`}</span>
+                      <span>데이터: {formatDataAmount(plan.dataAmount)} </span>
                     </div>
                     <div className="maid-info-item">
                       <span style={pinkIconStyle}>

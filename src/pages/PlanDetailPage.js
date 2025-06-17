@@ -26,7 +26,6 @@ function PlanDetailPage() {
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const token = localStorage.getItem('accessToken');
-  console.log('🔑 토큰:', token); 
   // const userId = localStorage.getItem('userId');
   const userInfoRaw = localStorage.getItem('userInfo');
   const userInfo = userInfoRaw ? JSON.parse(userInfoRaw) : null;
@@ -34,6 +33,13 @@ function PlanDetailPage() {
   const [reviews, setReviews] = useState([]);
   const [aiSummary, setAiSummary] = useState(null);
   const [error, setError] = useState(null);
+
+    // GB 파싱
+  const formatDataAmount = (amount) => {
+    if (amount === -1) return "무제한";
+    if (amount >= 1024) return `${Math.floor(amount / 1024)}GB`;
+    return `${amount}MB`;
+  };
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/plans/${id}`)
@@ -150,7 +156,8 @@ function PlanDetailPage() {
               데이터
             </div>
             <div className="maid-info-value">
-              {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`}
+              {/* {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`} */}
+              {formatDataAmount(plan.dataAmount)}
             </div>
           </div>
 
