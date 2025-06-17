@@ -10,11 +10,13 @@ import MainLayout from './components/layout/MainLayout';
 import FindPasswordPage from './pages/FindPasswordPage';
 import FAQPage from './pages/FAQPage';
 import ChatbotPage from './pages/ChatbotPage';
+import { NotificationProvider } from './context/NotificationContext'; // 알림 context
 
 function App() {
   return (
     <Router>
       <div>
+        <NotificationProvider> 
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -30,6 +32,7 @@ function App() {
           <Route path="/chatbot" element={<ChatbotPage />} />
         </Route>
         </Routes>
+        </NotificationProvider>
       </div>
     </Router>
   );

@@ -1,9 +1,12 @@
-//요금제 비교페이지
+// //요금제 비교페이지
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Smartphone, Phone, MessageSquare, Gift, User, ArrowLeft, Plus } from 'lucide-react';
-import 'styles/PlanComparePage.css'; // CSS 파일 import
+import {
+  Smartphone, Phone, MessageSquare, Gift, User, ArrowLeft
+} from 'lucide-react';
+import 'styles/PlanComparePage.css';
+import { NotificationProvider, useNotification } from 'context/NotificationContext'; // 알림 컨텍스트
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
@@ -20,7 +23,8 @@ const pinkIconStyle = {
   height: '40px'
 };
 
-function PlanComparePage() {
+// 내부 컴포넌트 분리해서 Provider 안에서만 useNotification 사용
+const PlanCompareInner = () => {
   const [plans, setPlans] = useState([]);
   const [userPlans, setUserPlans] = useState([]);
   const [selectedUserPlan, setSelectedUserPlan] = useState('');
@@ -28,18 +32,16 @@ function PlanComparePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { showNotification } = useNotification(); 
 
   const accessToken = localStorage.getItem("accessToken");
 
-  // GB 파싱
   const formatDataAmount = (amount) => {
     if (amount === -1) return "무제한";
     if (amount >= 1024) return `${Math.floor(amount / 1024)}GB`;
     return `${amount}MB`;
   };
 
-
-  // 비교할 요금제 가져오기
   useEffect(() => {
     const ids = params.get('ids');
     if (ids) {
@@ -59,7 +61,6 @@ function PlanComparePage() {
     }
   }, [params]);
 
-  // 로그인 사용자일 경우 내 요금제 불러오기
   useEffect(() => {
     if (!accessToken) return;
     fetch(`${API_BASE_URL}/api/user-plans`, {
@@ -77,18 +78,18 @@ function PlanComparePage() {
       });
   }, [accessToken]);
 
-  // 드롭다운 선택 후 비교에 추가
   const handleAddUserPlan = () => {
     if (!selectedUserPlan) {
-      alert("요금제를 선택해주세요 💕");
+      showNotification("요금제를 선택해주세요 💕");
       return;
     }
-    
+
     const currentParams = params.get('ids');
     const existingIds = currentParams ? currentParams.split(',') : [];
 
     if (existingIds.includes(selectedUserPlan)) {
-      alert("이미 비교 목록에 추가된 요금제에요! 💖");
+      showNotification("success", "요금제를 성공적으로 추가했어요!");
+      showNotification("error", "이미 비교하고 있는 요금제 입니다!");
       return;
     }
 
@@ -111,12 +112,10 @@ function PlanComparePage() {
 
   return (
     <div className="compare-page-container">
-      {/* 장식용 배경 요소들 */}
       <div className="compare-decoration-1">🎀</div>
       <div className="compare-decoration-2">💖</div>
       <div className="compare-decoration-3">🌺</div>
 
-      {/* 페이지 헤더 */}
       <div className="compare-page-header">
         <h1 className="compare-page-title">요금제 비교</h1>
         <p className="compare-page-subtitle">
@@ -124,7 +123,6 @@ function PlanComparePage() {
         </p>
       </div>
 
-      {/* 뒤로가기 버튼 */}
       <div style={{ marginBottom: '2rem' }}>
         <button className="maid-back-btn" onClick={handleBackToList}>
           <ArrowLeft size={16} style={{ marginRight: '0.5rem' }} />
@@ -132,7 +130,6 @@ function PlanComparePage() {
         </button>
       </div>
 
-      {/* 로그인 사용자만 보이는 내 요금제 추가 영역 */}
       {accessToken && userPlans.length > 0 && (
         <div className="maid-user-plan-card">
           <div className="user-plan-header">
@@ -163,7 +160,6 @@ function PlanComparePage() {
         </div>
       )}
 
-      {/* 비교 결과 */}
       {plans.length === 0 ? (
         <div className="compare-grid">
           <div className="maid-compare-empty">
@@ -185,75 +181,45 @@ function PlanComparePage() {
               className={`maid-compare-card ${userPlanIds.includes(plan.id) ? 'is-my-plan' : ''}`}
               onClick={() => navigate(`/plans/${plan.id}`)}
             >
-              {/* 요금제 헤더 */}
               <div className="compare-card-header">
-                <h3 className="compare-plan-name">
-                  {plan.name}
-                </h3>
-                <div className="compare-price-tag">
-                  {plan.price.toLocaleString()}원
-                </div>
+                <h3 className="compare-plan-name">{plan.name}</h3>
+                <div className="compare-price-tag">{plan.price.toLocaleString()}원</div>
               </div>
 
-              {/* 요금제 상세 정보 */}
               <div className="compare-plan-info">
                 <div className="compare-info-item">
-                  <div className="compare-info-icon">
-                    <Smartphone size={20} />
-                  </div>
+                  <div className="compare-info-icon"><Smartphone size={20} /></div>
                   <div className="compare-info-content">
                     <div className="compare-info-label">데이터</div>
-                    <div className="compare-info-value">
-                      {/* {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`} */}
-                      {formatDataAmount(plan.dataAmount)}
-                    </div>
+                    <div className="compare-info-value">{formatDataAmount(plan.dataAmount)}</div>
                   </div>
                 </div>
-
                 <div className="compare-info-item">
-                  <div className="compare-info-icon">
-                    <Phone size={20} />
-                  </div>
+                  <div className="compare-info-icon"><Phone size={20} /></div>
                   <div className="compare-info-content">
                     <div className="compare-info-label">통화</div>
-                    <div className="compare-info-value">
-                       {plan.callAmount === -1 ? '무제한' : `${plan.callAmount}분`}
-                    </div>
+                    <div className="compare-info-value">{plan.callAmount === -1 ? '무제한' : `${plan.callAmount}분`}</div>
                   </div>
                 </div>
-
                 <div className="compare-info-item">
-                  <div className="compare-info-icon">
-                    <MessageSquare size={20} />
-                  </div>
+                  <div className="compare-info-icon"><MessageSquare size={20} /></div>
                   <div className="compare-info-content">
                     <div className="compare-info-label">문자</div>
-                    <div className="compare-info-value">
-                      {plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}
-                    </div>
+                    <div className="compare-info-value">{plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}</div>
                   </div>
                 </div>
-
                 {plan.specialFeatures && (
                   <div className="compare-info-item">
-                    <div className="compare-info-icon">
-                      <Gift size={20} />
-                    </div>
+                    <div className="compare-info-icon"><Gift size={20} /></div>
                     <div className="compare-info-content">
                       <div className="compare-info-label">특별혜택</div>
-                      <div className="compare-info-value">
-                        {plan.specialFeatures}
-                      </div>
+                      <div className="compare-info-value">{plan.specialFeatures}</div>
                     </div>
                   </div>
                 )}
-
-                {/* 통신사 정보 */}
                 {plan.carrier && (
                   <div className="compare-info-item">
-                    <div className="compare-info-icon">
-                      <span style={{ fontSize: '1.2rem' }}>📡</span>
-                    </div>
+                    <div className="compare-info-icon"><span style={{ fontSize: '1.2rem' }}>📡</span></div>
                     <div className="compare-info-content">
                       <div className="compare-info-label">통신사</div>
                       <div className="compare-info-value">
@@ -270,7 +236,6 @@ function PlanComparePage() {
         </div>
       )}
 
-      {/* 비교 결과 요약 */}
       {plans.length > 0 && (
         <div style={{ 
           textAlign: 'center', 
@@ -283,14 +248,20 @@ function PlanComparePage() {
           fontWeight: '500'
         }}>
           <p style={{ margin: '0' }}>
-            총 {plans.length}개의 요금제를 비고하고 있어요 ✨
-            <br />
+            총 {plans.length}개의 요금제를 비교하고 있어요 ✨<br />
             각 카드를 클릭하면 상세 정보를 볼 수 있어요!
           </p>
         </div>
       )}
     </div>
   );
-}
+};
+
+// 외부에서 NotificationProvider로 감싸서 export
+const PlanComparePage = () => (
+  <NotificationProvider>
+    <PlanCompareInner />
+  </NotificationProvider>
+);
 
 export default PlanComparePage;

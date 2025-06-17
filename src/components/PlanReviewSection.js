@@ -1,7 +1,8 @@
-// 요금제 상세페이지 하단 리뷰 부분
-
+// // 요금제 상세페이지 하단 리뷰 부분
 import React, { useState } from 'react';
+import { useNotification } from 'context/NotificationContext';
 import 'styles/PlanReviewSection.css';
+import DeleteConfirmModal from '../components/DeleteConfirmModal'; // 올바른 경로로 수정
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
@@ -11,6 +12,9 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
   const [editContent, setEditContent] = useState('');
   const [editRating, setEditRating] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [targetReviewId, setTargetReviewId] = useState(null);
+  const { showNotification } = useNotification();
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -22,7 +26,7 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
 
   const handleCreateReview = async () => {
     if (!newReview.content.trim()) {
-      alert('리뷰 내용을 입력해주세요! 💕');
+      showNotification('info', '리뷰 내용을 입력해주세요! 💕');
       return;
     }
 
@@ -38,13 +42,14 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
       });
 
       if (response.ok) {
+        showNotification('success', '리뷰가 등록되었어요! ✨');
         setNewReview({ rating: 5, content: '' });
         onReload();
       } else {
         throw new Error('리뷰 등록에 실패했습니다');
       }
     } catch (err) {
-      alert('등록 실패: ' + err.message);
+      showNotification('error', '등록 실패: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -52,7 +57,7 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
 
   const handleUpdateReview = async (reviewId) => {
     if (!editContent.trim()) {
-      alert('리뷰 내용을 입력해주세요! 💕');
+      showNotification('info', '리뷰 내용을 입력해주세요! 💕');
       return;
     }
 
@@ -67,6 +72,7 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
       });
 
       if (response.ok) {
+        showNotification('success', '리뷰가 수정되었어요! 💫');
         setEditReviewId(null);
         setEditContent('');
         setEditRating(5);
@@ -75,30 +81,33 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
         throw new Error('리뷰 수정에 실패했습니다');
       }
     } catch (err) {
-      alert('수정 실패: ' + err.message);
+      showNotification('error', '수정 실패: ' + err.message);
     }
   };
 
-  const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm('정말로 이 리뷰를 삭제하시겠어요? 💔')) {
-      return;
-    }
+  const handleDeleteClick = (reviewId) => {
+    setTargetReviewId(reviewId);
+    setModalOpen(true);
+  };
 
+  const handleDeleteReview = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/plans/${planId}/reviews/${reviewId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/plans/${planId}/reviews/${targetReviewId}`, {
         method: 'DELETE',
-        headers: {
-          'X-AUTH-TOKEN': token
-        }
+        headers: { 'X-AUTH-TOKEN': token }
       });
 
       if (response.ok) {
+        showNotification('success', '리뷰가 삭제되었어요 🗑️');
         onReload();
       } else {
         throw new Error('리뷰 삭제에 실패했습니다');
       }
     } catch (err) {
-      alert('삭제 실패: ' + err.message);
+      showNotification('error', '삭제 실패: 본인이 작성한 리뷰만 삭제할 수 있어요!');
+    } finally {
+      setModalOpen(false);
+      setTargetReviewId(null);
     }
   };
 
@@ -129,113 +138,77 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
         </div>
       ) : (
         <div style={{ marginBottom: '2rem' }}>
-          {reviews.map(review => {
-            // console.log('👤 리뷰 작성자 userId:', review.userId);
-            // console.log('👤 현재 로그인 유저 userId:', userId);
-            // console.log('⚖️ 일치?', String(review.userId) === String(userId));
-
-            return (
-              <div key={review.id} className={`maid-review-card ${editReviewId === review.id ? 'editing' : ''}`}>
-                <div className="maid-review-rating">
-                  <span className="maid-rating-label">평점:</span>
-                  <div className="maid-rating-stars">{renderStars(review.rating)}</div>
-                  <span style={{ color: '#be185d', fontWeight: '600', marginLeft: '0.5rem' }}>
-                    ({review.rating}/5)
-                  </span>
-                </div>
-
-                {editReviewId !== review.id ? (
-                  <div className="maid-review-content">{review.content}</div>
-                ) : (
-                  <div className="maid-edit-form">
-                    <textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      placeholder="리뷰를 수정해주세요... 💕"
-                      className="maid-edit-input"
-                    />
-                    <select
-                      value={editRating}
-                      onChange={(e) => setEditRating(Number(e.target.value))}
-                      className="maid-rating-select"
-                    >
-                      {[1, 2, 3, 4, 5].map(n => (
-                        <option key={n} value={n}>
-                          {n}점 - {renderStars(n).map((star, i) => star.props.children).join('')}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {String(review.userId) === String(userId) && (
-                  <div className="maid-review-actions">
-                    {editReviewId !== review.id ? (
-                      <>
-                        <button onClick={() => startEdit(review)} className="maid-action-btn maid-edit-btn">
-                          수정 시작
-                        </button>
-                        <button onClick={() => handleDeleteReview(review.id)} className="maid-action-btn maid-delete-btn">
-                          삭제
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleUpdateReview(review.id)} className="maid-action-btn maid-save-btn">
-                          저장
-                        </button>
-                        <button onClick={cancelEdit} className="maid-action-btn maid-cancel-btn">
-                          취소
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
+          {reviews.map(review => (
+            <div key={review.id} className={`maid-review-card ${editReviewId === review.id ? 'editing' : ''}`}>
+              <div className="maid-review-rating">
+                <span className="maid-rating-label">평점:</span>
+                <div className="maid-rating-stars">{renderStars(review.rating)}</div>
+                <span style={{ color: '#be185d', fontWeight: '600', marginLeft: '0.5rem' }}>
+                  ({review.rating}/5)
+                </span>
               </div>
-            );
-          })}
+
+              {editReviewId !== review.id ? (
+                <div className="maid-review-content">{review.content}</div>
+              ) : (
+                <div className="maid-edit-form">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    placeholder="리뷰를 수정해주세요... 💕"
+                    className="maid-edit-input"
+                  />
+                  <select
+                    value={editRating}
+                    onChange={(e) => setEditRating(Number(e.target.value))}
+                    className="maid-rating-select"
+                  >
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <option key={n} value={n}>
+                        {n}점 - {renderStars(n).map(star => star.props.children).join('')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {String(review.userId) === String(userId) && (
+                <div className="maid-review-actions">
+                  {editReviewId !== review.id ? (
+                    <>
+                      <button onClick={() => startEdit(review)} className="maid-action-btn maid-edit-btn">
+                        수정 시작
+                      </button>
+                      <button onClick={() => handleDeleteClick(review.id)} className="maid-action-btn maid-delete-btn">
+                        삭제
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => handleUpdateReview(review.id)} className="maid-action-btn maid-save-btn">
+                        저장
+                      </button>
+                      <button onClick={cancelEdit} className="maid-action-btn maid-cancel-btn">
+                        취소
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
-      <div className="maid-new-review-section">
-        <h4 className="maid-new-review-title">새 리뷰 작성</h4>
-
-        <div className="maid-new-review-form">
-          <textarea
-            value={newReview.content}
-            onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
-            placeholder="이 요금제에 대한 솔직한 후기를 들려주세요... 어떤 점이 좋았나요? 💕"
-            className="maid-review-textarea"
-            disabled={isSubmitting}
-          />
-
-          <div className="maid-form-row">
-            <div className="maid-rating-group">
-              <span className="maid-rating-label-new">평점:</span>
-              <select
-                value={newReview.rating}
-                onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-                className="maid-rating-select"
-                disabled={isSubmitting}
-              >
-                {[1, 2, 3, 4, 5].map(n => (
-                  <option key={n} value={n}>
-                    {n}점 {renderStars(n).map((star, i) => star.props.children).join('')}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              onClick={handleCreateReview}
-              disabled={isSubmitting || !newReview.content.trim()}
-              className="maid-submit-btn"
-            >
-              {isSubmitting ? '등록 중...' : '리뷰 등록'}
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* 삭제 확인 모달 */}
+      <DeleteConfirmModal
+        isOpen={modalOpen}
+        onConfirm={handleDeleteReview}
+        onCancel={() => {
+          setModalOpen(false);
+          setTargetReviewId(null);
+        }}
+      />
     </div>
   );
 }
