@@ -13,45 +13,49 @@ const UsageSection = () => {
   const [usages, setUsages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [phoneOptions, setPhoneOptions] = useState([]); // 전화번호 목록
-  const [planInfoMap, setPlanInfoMap] = useState({});   // phoneNumber → plan info
+  const [phoneOptions, setPhoneOptions] = useState([]);
+  const [planInfoMap, setPlanInfoMap] = useState({});
 
   const getToken = () => localStorage.getItem('accessToken');
 
-  // 최초 로드: 디폴트 월 설정 + 사용자 요금제 정보 불러오기
+  // 최초 로딩 시
   useEffect(() => {
     const today = new Date();
     const defaultMonth = today.toISOString().slice(0, 7);
     setFilters(prev => ({ ...prev, month: defaultMonth }));
 
     fetchCurrentMonthUsage();
-    fetchUserPlans(); // 전화번호, 요금제 이름/가격 매핑
+    fetchUserLines();
   }, []);
 
   const handleInputChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
-  const fetchUserPlans = async () => {
+  const fetchUserLines = async () => {
     try {
       const token = getToken();
-      const res = await axios.get(`${API_BASE_URL}/api/user-plans`, {
+      const res = await axios.get(`${API_BASE_URL}/api/lines`, {
         headers: { 'X-AUTH-TOKEN': token }
       });
 
-      const phones = res.data.data.map(p => p.phoneNumber);
+      const lines = res.data.data; // ✅ 이게 누락되어 있었음
+      const phones = lines.map(line => line.phoneNumber); // 전화번호 목록 추출
+
       const map = {};
-      res.data.data.forEach(p => {
-        map[p.phoneNumber] = {
-          planName: p.planName,
-          price: p.discountedPrice
+      lines.forEach(line => {
+        map[line.phoneNumber] = {
+          planId: line.planId,
+          discountedPrice: line.discountedPrice,
+          status: line.status,
+          planName: line.planName
         };
       });
 
       setPhoneOptions(phones);
       setPlanInfoMap(map);
     } catch (e) {
-      console.warn('요금제 정보 불러오기 실패:', e);
+      console.warn('전체 회선 정보 불러오기 실패:', e);
     }
   };
 
@@ -130,7 +134,6 @@ const UsageSection = () => {
           name="month"
           value={filters.month}
           onChange={handleInputChange}
-          placeholder="조회 월"
         />
 
         <button onClick={fetchUsageData}>조회</button>
@@ -151,6 +154,7 @@ const UsageSection = () => {
               <th>데이터</th>
               <th>통화</th>
               <th>문자</th>
+              <th>가입상태</th>
             </tr>
           </thead>
           <tbody>
@@ -159,12 +163,13 @@ const UsageSection = () => {
               return (
                 <tr key={idx}>
                   <td>{planInfo.planName || 'N/A'}</td>
-                  <td>{planInfo.price ? `${planInfo.price}원` : 'N/A'}</td>
+                  <td>{planInfo.discountedPrice ? `${planInfo.discountedPrice}원` : 'N/A'}</td>
                   <td>{u.phoneNumber}</td>
                   <td>{`${u.year}-${String(u.month).padStart(2, '0')}`}</td>
                   <td>{u.data} MB</td>
                   <td>{u.callMinute} 분</td>
                   <td>{u.message} 건</td>
+                  <td>{planInfo.status === 'active' ? '가입 중' : '해지됨'}</td>
                 </tr>
               );
             })}
