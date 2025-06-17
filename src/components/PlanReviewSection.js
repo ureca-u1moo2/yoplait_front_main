@@ -130,9 +130,9 @@ function PlanReviewSection({ planId, reviews = [], userId, token, onReload }) {
       ) : (
         <div style={{ marginBottom: '2rem' }}>
           {reviews.map(review => {
-            console.log('👤 리뷰 작성자 userId:', review.userId);
-            console.log('👤 현재 로그인 유저 userId:', userId);
-            console.log('⚖️ 일치?', String(review.userId) === String(userId));
+            // console.log('👤 리뷰 작성자 userId:', review.userId);
+            // console.log('👤 현재 로그인 유저 userId:', userId);
+            // console.log('⚖️ 일치?', String(review.userId) === String(userId));
 
             return (
               <div key={review.id} className={`maid-review-card ${editReviewId === review.id ? 'editing' : ''}`}>

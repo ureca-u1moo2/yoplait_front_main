@@ -404,7 +404,13 @@ const TelecomMainPage = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-lg">🍓</span>
+                {/* <span className="text-white font-bold text-lg">🍓</span> */}
+                {/* 로고 이미지로 교체 */}
+                <img 
+                  src="/assets/Yoplait.png" // 👉 여기에 실제 이미지 경로
+                  alt="로고"
+                  className="w-10 h-10 rounded-full object-cover mr-3 shadow-sm"
+                />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
                 요플레
@@ -498,7 +504,18 @@ const TelecomMainPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <span className="text-6xl">🍦</span>
+              {/* <span className="text-6xl">🍦</span> */}
+              {/* 이모티콘 대신 이미지로 변경함 */}
+              <div className="relative">
+                <img 
+                  src="/assets/cute1.png"
+                  alt="요플레 캐릭터"
+                  className="w-24 h-24 rounded-full object-cover shadow-2xl animate-bounce border-4 border-pink-200"
+                />
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full flex items-center justify-center animate-pulse">
+                  <span className="text-white text-sm">✨</span>
+                </div>
+              </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               {isLoggedIn ? (

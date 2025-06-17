@@ -31,6 +31,14 @@ function PlanComparePage() {
 
   const accessToken = localStorage.getItem("accessToken");
 
+  // GB 파싱
+  const formatDataAmount = (amount) => {
+    if (amount === -1) return "무제한";
+    if (amount >= 1024) return `${Math.floor(amount / 1024)}GB`;
+    return `${amount}MB`;
+  };
+
+
   // 비교할 요금제 가져오기
   useEffect(() => {
     const ids = params.get('ids');
@@ -196,7 +204,8 @@ function PlanComparePage() {
                   <div className="compare-info-content">
                     <div className="compare-info-label">데이터</div>
                     <div className="compare-info-value">
-                      {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`}
+                      {/* {plan.dataAmount === -1 ? '무제한' : `${plan.dataAmount}MB`} */}
+                      {formatDataAmount(plan.dataAmount)}
                     </div>
                   </div>
                 </div>
