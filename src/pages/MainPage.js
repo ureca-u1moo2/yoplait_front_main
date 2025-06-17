@@ -163,8 +163,19 @@ const TelecomMainPage = () => {
         window.location.href = '/login';
       }, 2000);
     } else {
-      // 로그인된 경우 추천 페이지로
-      showNotification('info', '맞춤 요금제 추천 페이지로 이동합니다. (준비 중)');
+      // 선택된 사용 유형에 따라 챗봇으로 이동
+      let message = '';
+      if (selectedUsage === 'light') {
+        message = '라이트 사용자에게 맞는 요금제를 추천해주세요. 주로 전화와 문자를 많이 사용하고, 데이터 사용량은 적은 편입니다.';
+      } else if (selectedUsage === 'heavy') {
+        message = '헤비 사용자에게 맞는 요금제를 추천해주세요. 영상 시청, 게임, SNS 등으로 데이터를 많이 사용합니다.';
+      } else {
+        message = '요금제 추천을 받고 싶어요. 제게 맞는 요금제를 찾아주세요.';
+      }
+      
+      // 메시지를 URL 파라미터로 전달하여 챗봇 페이지로 이동
+      const encodedMessage = encodeURIComponent(message);
+      window.location.href = `/chatbot?message=${encodedMessage}`;
     }
   };
 
@@ -184,6 +195,21 @@ const TelecomMainPage = () => {
       } else {
         showNotification('info', `${menu} 페이지 준비 중입니다.`);
       }
+  };
+
+  // 챗봇 클릭 핸들러 - 로그인 체크 추가
+  const handleChatbotClick = () => {
+    if (!isLoggedIn) {
+      // 로그인이 필요한 경우
+      localStorage.setItem('redirectAfterLogin', window.location.pathname);
+      showNotification('info', '챗봇 서비스는 로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+    } else {
+      // 로그인된 경우 챗봇 페이지로
+      window.location.href = `/chatbot`;
+    }
   };
 
   // 데이터 변환 함수들 (-1일 때 무제한 처리)
@@ -265,7 +291,7 @@ const TelecomMainPage = () => {
 
   const handlePlanDetail = (planId) => {
     // 새창으로 요금제 상세 페이지 이동
-    window.open(`/plans/${planId}`, '_blank');
+    window.location.href = `/plans/${planId}`;
   };
 
   const features = [
@@ -276,8 +302,8 @@ const TelecomMainPage = () => {
     },
     {
       icon: <Users className="w-8 h-8 text-pink-400" />,
-      title: "비회원 맞춤 추천",
-      description: "비회원도 간단한 질의 응답을 통해 맞춤 요금제를 추천받을 수 있습니다."
+      title: "개인 맞춤 추천",
+      description: "개인 데이터를 기반으로 맞춤 요금제를 추천받을 수 있습니다."
     },
     {
       icon: <DollarSign className="w-8 h-8 text-rose-500" />,
@@ -498,7 +524,7 @@ const TelecomMainPage = () => {
               ) : (
                 <>
                   AI가 분석하는 개인 맞춤형 요금제 추천 서비스<br/>
-                  복잡한 요금제 비교는 이제 그만, 3분만에 최적의 요금제를 찾아보세요
+                  복잡한 요금제 비교는 이제 그만, 최적의 요금제를 찾아보세요
                 </>
               )}
             </p>
@@ -506,16 +532,17 @@ const TelecomMainPage = () => {
             {/* Quick Survey */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-2xl mx-auto mb-12 border border-pink-100">
               <h3 className="text-2xl font-semibold text-gray-900 mb-6">
-                {isLoggedIn ? '맞춤 요금제 추천' : '빠른 요금제 진단'}
+                {isLoggedIn ? '맞춤 요금제 추천' : '요금제 진단'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <button
                   onClick={() => setSelectedUsage('light')}
+                  disabled={!isLoggedIn}
                   className={`p-6 rounded-2xl border-2 transition-all transform hover:scale-105 ${
                     selectedUsage === 'light' 
                       ? 'border-pink-400 bg-pink-50 text-pink-700 shadow-lg' 
                       : 'border-pink-200 hover:border-pink-300 bg-white/50'
-                  }`}
+                  } ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <span className="text-3xl mb-3 block">🥛</span>
                   <div className="font-semibold">라이트 사용자</div>
@@ -523,11 +550,12 @@ const TelecomMainPage = () => {
                 </button>
                 <button
                   onClick={() => setSelectedUsage('heavy')}
+                  disabled={!isLoggedIn}
                   className={`p-6 rounded-2xl border-2 transition-all transform hover:scale-105 ${
                     selectedUsage === 'heavy' 
                       ? 'border-pink-400 bg-pink-50 text-pink-700 shadow-lg' 
                       : 'border-pink-200 hover:border-pink-300 bg-white/50'
-                  }`}
+                  } ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <span className="text-3xl mb-3 block">🍓</span>
                   <div className="font-semibold">헤비 사용자</div>
@@ -538,12 +566,12 @@ const TelecomMainPage = () => {
                 onClick={handlePlanRecommendation}
                 className="w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white py-4 rounded-2xl font-semibold text-lg hover:from-pink-500 hover:to-rose-600 transition-all transform hover:scale-105 shadow-lg"
               >
-                나에게 맞는 요금제 찾기
+                {isLoggedIn ? '나에게 맞는 요금제 찾기' : '로그인 후 이용하기'}
               </button>
               
               {!isLoggedIn && (
                 <p className="text-sm text-gray-500 mt-3 text-center">
-                  더 정확한 추천을 위해 로그인이 필요합니다.
+                  정확한 개인 맞춤 추천을 위해 로그인이 필요합니다.
                 </p>
               )}
             </div>
@@ -666,7 +694,7 @@ const TelecomMainPage = () => {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(`/plans/${plan.id}`, '_blank');
+                        window.location.href = `/plans/${plan.id}`;
                       }}
                       className={`w-full py-4 rounded-2xl font-semibold transition-all transform hover:scale-105 ${
                         plan.popular 
@@ -694,18 +722,17 @@ const TelecomMainPage = () => {
           <p className="text-xl text-pink-100 mb-8">
             {isLoggedIn 
               ? '개인 맞춤 요금제로 월 평균 2만원 이상 절약하세요 💰'
-              : '3분만 투자하면 월 요금을 더 많이 절약할 수 있어요 💰'
+              : '개인 맞춤 요금제로 더 많이 절약할 수 있어요 💰'
             }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {isLoggedIn ? (
               <>
                 <button 
-                  onClick={() => window.open(`/chatbot`, '_blank')
-}
+                  onClick={handleChatbotClick}
                   className="bg-white text-pink-500 px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-pink-50 transition-all transform hover:scale-105 shadow-lg"
                 >
-                  맞춤 요금제 추천받기
+                  AI 챗봇 상담하기
                 </button>
               </>
             ) : (
@@ -715,6 +742,12 @@ const TelecomMainPage = () => {
                   className="bg-white text-pink-500 px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-pink-50 transition-all transform hover:scale-105 shadow-lg"
                 >
                   무료 회원가입 시작
+                </button>
+                <button 
+                  onClick={() => window.location.href = '/login'}
+                  className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-white hover:text-pink-500 transition-all transform hover:scale-105"
+                >
+                  로그인하기
                 </button>
               </>
             )}
@@ -766,17 +799,24 @@ const TelecomMainPage = () => {
         </div>
       </footer>
 
-      {/* 챗봇 아이콘 - 우측 하단 고정 */}
+      {/* 챗봇 아이콘 - 우측 하단 고정 (로그인 체크 추가) */}
       <div className="fixed bottom-6 right-6 z-50">
         <button 
-          onClick={() => window.open(`/chatbot`, '_blank')}
-          className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group"
+          onClick={handleChatbotClick}
+          className={`w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group relative ${
+            !isLoggedIn ? 'opacity-75' : ''
+          }`}
         >
           <MessageCircle className="w-7 h-7 text-white group-hover:animate-pulse" />
+          {!isLoggedIn && (
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">!</span>
+            </div>
+          )}
         </button>
         {/* 툴팁 */}
         <div className="absolute bottom-20 right-0 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          AI 챗봇 문의
+          {isLoggedIn ? 'AI 챗봇 문의' : '로그인 후 이용 가능'}
         </div>
       </div>
     </div>
