@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, User, Mail, Lock, Phone, Calendar, ArrowRight, CheckCircle, X } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Lock, Calendar, ArrowRight, CheckCircle, X } from 'lucide-react';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -7,7 +7,6 @@ const SignupPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
     birthDate: '',
     gender: ''
   });
@@ -161,7 +160,7 @@ const SignupPage = () => {
         if (data.data && data.data.accessToken) {
           // 토큰이 반환된 경우 자동 로그인 처리
           try {
-            const { handleLoginSuccess } = await import('./auth');
+            const { handleLoginSuccess } = await import('../auth');
             handleLoginSuccess(data);
             
             // 3초 후 메인 페이지로 리다이렉트

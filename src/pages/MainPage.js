@@ -91,7 +91,7 @@ const TelecomMainPage = () => {
               voice: formatCallAmount(plan.callAmount),
               message: formatSmsAmount(plan.smsAmount),
               description: plan.description,
-              popular: index === 1, 
+              popular: index === 1,
               emoji: getEmoji(index),
               company: "LG U+",
               createdAt: plan.createdAt,
@@ -210,8 +210,24 @@ const TelecomMainPage = () => {
     return emojis[index] || "📱";
   };
 
-  // 기본 요금제 데이터 (API 실패 시 폴백)
+  // 기본 요금제 데이터 (API 실패 시 폴백) - 2, 1, 3 순서
   const getDefaultPlans = () => [
+    {
+      id: "fallback-2", 
+      name: "LG U+ 5GX 레귤러",
+      price: "45,000원",
+      data: "12GB + 매일 300MB",
+      voice: "무제한",
+      message: "무제한",
+      popular: true, // 첫 번째가 인기 요금제
+      emoji: "🍓",
+      company: "LG U+",
+      description: "인기 요금제",
+      tags: [
+        { id: "tag3", tagName: "5G" },
+        { id: "tag4", tagName: "대용량" }
+      ]
+    },
     {
       id: "fallback-1",
       name: "LG U+ 슬림",
@@ -226,22 +242,6 @@ const TelecomMainPage = () => {
       tags: [
         { id: "tag1", tagName: "5G" },
         { id: "tag2", tagName: "경제형" }
-      ]
-    },
-    {
-      id: "fallback-2", 
-      name: "LG U+ 5GX 레귤러",
-      price: "45,000원",
-      data: "12GB + 매일 300MB",
-      voice: "무제한",
-      message: "무제한",
-      popular: true,
-      emoji: "🍓",
-      company: "LG U+",
-      description: "인기 요금제",
-      tags: [
-        { id: "tag3", tagName: "5G" },
-        { id: "tag4", tagName: "대용량" }
       ]
     },
     {
@@ -264,7 +264,8 @@ const TelecomMainPage = () => {
   ];
 
   const handlePlanDetail = (planId) => {
-    showNotification('info', `${planId} 요금제 상세 페이지로 이동합니다. (준비 중)`);
+    // 새창으로 요금제 상세 페이지 이동
+    window.open(`/plans/${planId}`, '_blank');
   };
 
   const features = [
@@ -391,13 +392,6 @@ const TelecomMainPage = () => {
               >
                 요금제 목록
               </button>
-              {/*  불필요할 것으로 예상됨 */}
-              {/* <button 
-                onClick={() => handleNavClick('요금제 비교')}
-                className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
-              >
-                요금제 비교
-              </button> */}
               <button 
                 onClick={() => handleNavClick('FAQ')}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
@@ -672,7 +666,7 @@ const TelecomMainPage = () => {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        showNotification('info', `${plan.name} 상세 페이지 준비 중입니다.`);
+                        window.open(`/plans/${plan.id}`, '_blank');
                       }}
                       className={`w-full py-4 rounded-2xl font-semibold transition-all transform hover:scale-105 ${
                         plan.popular 
@@ -707,16 +701,11 @@ const TelecomMainPage = () => {
             {isLoggedIn ? (
               <>
                 <button 
-                  onClick={() => showNotification('info', '맞춤 요금제 추천 페이지 준비 중입니다.')}
+                  onClick={() => window.open(`/chatbot`, '_blank')
+}
                   className="bg-white text-pink-500 px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-pink-50 transition-all transform hover:scale-105 shadow-lg"
                 >
                   맞춤 요금제 추천받기
-                </button>
-                <button 
-                  onClick={() => showNotification('info', '요금제 비교 페이지 준비 중입니다.')}
-                  className="border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-white hover:text-pink-500 transition-all transform hover:scale-105"
-                >
-                  요금제 비교하기
                 </button>
               </>
             ) : (
@@ -780,7 +769,7 @@ const TelecomMainPage = () => {
       {/* 챗봇 아이콘 - 우측 하단 고정 */}
       <div className="fixed bottom-6 right-6 z-50">
         <button 
-          onClick={() => window.location.href = '/chatbot'}
+          onClick={() => window.open(`/chatbot`, '_blank')}
           className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group"
         >
           <MessageCircle className="w-7 h-7 text-white group-hover:animate-pulse" />
