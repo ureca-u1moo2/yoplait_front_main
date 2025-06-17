@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageCircle, Send, X, ArrowLeft, Lock } from 'lucide-react';
 import { userManager } from '../auth';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import 'styles/ChatbotPage.css'; // 전용 CSS 파일 import
 
 const ChatbotPage = () => {
@@ -415,7 +417,7 @@ const ChatbotPage = () => {
     return (
       <div key={key} className={`chatbot-message-row ${isUser ? 'chatbot-message-user' : 'chatbot-message-bot'}`}>
         <div className={`chatbot-message-bubble ${isUser ? 'chatbot-user-bubble' : 'chatbot-bot-bubble'}`}>
-          {content}
+          {isUser ? content : <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>}
         </div>
       </div>
     );
