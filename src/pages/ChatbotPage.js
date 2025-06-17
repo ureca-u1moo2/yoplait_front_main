@@ -15,7 +15,8 @@ const ChatbotPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [authError, setAuthError] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false); // 초기화 상태 추가
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState(''); // 대기 중인 메시지 저장
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const navigate = useNavigate();
@@ -107,7 +108,7 @@ const ChatbotPage = () => {
     return localStorage.getItem('accessToken');
   };
 
-  // 공통 메시지 전송 함수 (인증 헤더 추가)
+  // 공통 메시지 전송 함수 (인증 헤더 추가) - sessionId를 의존성에 추가
   const sendMessage = useCallback(async (userMessage, additionalData = {}) => {
     if (!isLoggedIn) {
       setAuthError(true);
@@ -118,6 +119,13 @@ const ChatbotPage = () => {
     if (!token) {
       console.error('인증 토큰이 없습니다.');
       setAuthError(true);
+      return;
+    }
+
+    // sessionId가 없으면 대기
+    if (!sessionId) {
+      console.warn('sessionId가 아직 생성되지 않았습니다.');
+      setPendingMessage(userMessage); // 메시지를 저장해둠
       return;
     }
 
@@ -228,29 +236,27 @@ const ChatbotPage = () => {
       setWaitingMessage('');
       setIsWaitingForMainReply(false);
     }
-  }, [isLoggedIn, sessionId]);
+  }, [isLoggedIn, sessionId]); // sessionId를 의존성에 추가
 
-  // 세션 ID 생성 및 URL 파라미터 처리 (로그인된 경우에만)
+  // 세션 ID 생성 및 URL 파라미터 처리
   useEffect(() => {
     if (isLoggedIn && !isInitialized) {
       const newSessionId = crypto.randomUUID();
       setSessionId(newSessionId);
-      setIsInitialized(true); // 초기화 완료 표시
+      setIsInitialized(true);
       console.log('🆕 생성된 sessionId:', newSessionId);
 
-      // URL 파라미터에서 메시지 확인하고 자동 전송
+      // URL 파라미터에서 메시지 확인
       const urlParams = new URLSearchParams(window.location.search);
       const initialMessage = urlParams.get('message');
       
       if (initialMessage) {
-        // URL에서 message 파라미터 제거 (브라우저 히스토리 업데이트)
+        // URL에서 message 파라미터 제거
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
         
-        // 약간의 지연 후 메시지 자동 전송
-        setTimeout(() => {
-          sendMessage(decodeURIComponent(initialMessage));
-        }, 1000);
+        // 대기 메시지로 저장
+        setPendingMessage(decodeURIComponent(initialMessage));
       }
 
       const handleBeforeUnload = (e) => {
@@ -261,7 +267,16 @@ const ChatbotPage = () => {
       window.addEventListener('beforeunload', handleBeforeUnload);
       return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }
-  }, [isLoggedIn, isInitialized, sendMessage]); // isInitialized 추가
+  }, [isLoggedIn, isInitialized]);
+
+  // sessionId가 생성되고 대기 중인 메시지가 있으면 전송
+  useEffect(() => {
+    if (sessionId && pendingMessage && isLoggedIn) {
+      console.log('📨 대기 중이던 메시지 전송:', pendingMessage);
+      sendMessage(pendingMessage);
+      setPendingMessage(''); // 전송 후 초기화
+    }
+  }, [sessionId, pendingMessage, isLoggedIn, sendMessage]);
 
   const handleSend = async () => {
     if (!input.trim() || !isLoggedIn) return;
@@ -556,7 +571,7 @@ const ChatbotPage = () => {
   return (
     <div className="chatbot-page-container">
       {/* Chat Container */}
-      <div className="chatbot-main-container">{/* 기존 내용들... */}
+      <div className="chatbot-main-container">
         {/* Welcome Section */}
         <div className="chatbot-welcome-section">
           <div className="chatbot-welcome-icon">
