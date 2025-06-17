@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import MainPage from './MainPage';
-import LoginPage from './LoginPage';
-import SignupPage from './SignupPage';
+import MainPage from './pages/MainPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import PlanListPage from './pages/PlanListPage';
 import PlanDetailPage from './pages/PlanDetailPage';
 import PlanComparePage from './pages/PlanComparePage';
 import MyPage from './pages/MyPage';
 import MainLayout from './components/layout/MainLayout';
-import FindPasswordPage from './FindPasswordPage';
+import FindPasswordPage from './pages/FindPasswordPage';
 import FAQPage from './pages/FAQPage';
-import ChatbotPage from 'pages/ChatbotPage';
+import ChatbotPage from './pages/ChatbotPage';
 
 function App() {
   return (
