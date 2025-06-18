@@ -490,6 +490,7 @@
   gap: 0.75rem;
   max-width: 48rem;
   margin: 0 auto;
+  position: relative;
 }
 
 .chatbot-input {
@@ -980,4 +981,31 @@
 
 .chatbot-bot-bubble th {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.chatbot-tips {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(229, 231, 235, 0.4);
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+  border-radius: 0 0 12px 12px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.chatbot-tips-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.chatbot-tips-text {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.chatbot-tips-text strong {
+  color: #1d4ed8;
 }
