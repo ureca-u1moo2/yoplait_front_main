@@ -1,7 +1,9 @@
-// src/pages/PlansSection.jsx
+// PlansSection.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PlanCard from '../components/PlanCard';
+import DeleteConfirmModal from 'components/DeleteConfirmModal';
+import { useNotification } from 'context/NotificationContext';
 import 'styles/MyPage.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
@@ -13,6 +15,9 @@ const PlansSection = () => {
   const [reviewContent, setReviewContent] = useState('');
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [targetLineId, setTargetLineId] = useState(null);
+  const { showNotification } = useNotification();
 
   const fetchPlans = async () => {
     try {
@@ -22,7 +27,7 @@ const PlansSection = () => {
       });
       setPlans(res.data.data);
     } catch (error) {
-      console.error('요금제 조회 실패:', error);
+      showNotification('error', '요금제 조회 실패: ' + error.message);
     }
   };
 
@@ -30,16 +35,24 @@ const PlansSection = () => {
     fetchPlans();
   }, []);
 
-  const handleCancel = async (lineId) => {
+  const handleCancelRequest = (lineId) => {
+    setTargetLineId(lineId);
+    setCancelModalOpen(true);
+  };
+
+  const confirmCancel = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.delete(`${API_BASE_URL}/api/lines/${lineId}`, {
+      await axios.delete(`${API_BASE_URL}/api/lines/${targetLineId}`, {
         headers: { 'X-AUTH-TOKEN': token }
       });
-      alert('요금제가 정상적으로 해지되었습니다.');
+      showNotification('success', '요금제가 정상적으로 해지되었습니다.');
       fetchPlans();
     } catch (err) {
-      alert('해지 실패: ' + (err.response?.data?.message || err.message));
+      showNotification('error', '해지 실패: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setCancelModalOpen(false);
+      setTargetLineId(null);
     }
   };
 
@@ -52,8 +65,8 @@ const PlansSection = () => {
   };
 
   const submitReview = async () => {
-    if (!reviewContent.trim()) return alert('리뷰 내용을 입력해주세요.');
-    if (reviewRating === 0) return alert('별점을 선택해주세요.');
+    if (!reviewContent.trim()) return showNotification('info', '리뷰 내용을 입력해주세요.');
+    if (reviewRating === 0) return showNotification('info', '별점을 선택해주세요.');
 
     try {
       const token = localStorage.getItem('accessToken');
@@ -63,10 +76,10 @@ const PlansSection = () => {
       }, {
         headers: { 'X-AUTH-TOKEN': token }
       });
-      alert('리뷰가 등록되었습니다.');
+      showNotification('success', '리뷰가 등록되었습니다.');
       setShowReviewModal(false);
     } catch (err) {
-      alert('리뷰 등록 실패: ' + (err.response?.data?.message || err.message));
+      showNotification('error', '리뷰 등록 실패: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -124,7 +137,7 @@ const PlansSection = () => {
                 <PlanCard
                   key={plan.phoneNumber}
                   plan={plan}
-                  onCancel={handleCancel}
+                  onCancel={() => handleCancelRequest(plan.lineId)}
                   onReview={handleReview}
                 />
               ))}
@@ -141,22 +154,12 @@ const PlansSection = () => {
         }}>
           <div className="review-modal-content">
             <h3>리뷰 작성</h3>
-            <p style={{
-              textAlign: 'center',
-              color: '#be185d',
-              marginBottom: '1rem',
-              fontSize: '1.1rem',
-              fontWeight: '600'
-            }}>
+            <p style={{ textAlign: 'center', color: '#be185d', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600' }}>
               {reviewTarget?.planName}
             </p>
 
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <p style={{
-                marginBottom: '0.5rem',
-                color: '#be185d',
-                fontWeight: '600'
-              }}>
+              <p style={{ marginBottom: '0.5rem', color: '#be185d', fontWeight: '600' }}>
                 요금제 만족도를 평가해주세요!
               </p>
               <div className="star-rating" style={{
@@ -168,12 +171,7 @@ const PlansSection = () => {
               }}>
                 {renderStars()}
               </div>
-              <p style={{
-                fontSize: '1rem',
-                color: reviewRating > 0 ? '#be185d' : '#666',
-                margin: '0',
-                fontWeight: reviewRating > 0 ? '600' : 'normal'
-              }}>
+              <p style={{ fontSize: '1rem', color: reviewRating > 0 ? '#be185d' : '#666', margin: '0', fontWeight: reviewRating > 0 ? '600' : 'normal' }}>
                 {reviewRating > 0 ? `${reviewRating}점 선택됨 💕` : '별점을 선택해주세요'}
               </p>
             </div>
@@ -192,9 +190,22 @@ const PlansSection = () => {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        isOpen={cancelModalOpen}
+        onConfirm={confirmCancel}
+        onCancel={() => {
+          setCancelModalOpen(false);
+          setTargetLineId(null);
+        }}
+        title="요금제 해지"
+        message="정말로 요금제를 해지하시겠습니까?"
+        confirmText="해지할래요"
+        cancelText="안할래요"
+      />
+
     </div>
   );
 };
 
 export default PlansSection;
-
