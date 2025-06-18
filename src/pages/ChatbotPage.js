@@ -17,11 +17,50 @@ const ChatbotPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [authError, setAuthError] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [pendingMessage, setPendingMessage] = useState(''); // 대기 중인 메시지 저장
+  const [isInitialized, setIsInitialized] = useState(false); // 초기화 상태 추가
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const navigate = useNavigate();
+
+  // 버튼별 커스텀 설정을 반환하는 함수
+  const getButtonConfig = (button) => {
+    // 라벨 기반으로 커스텀 설정 결정
+    const configs = {
+      '성향 분석 하기': {
+        emoji: '🔍',
+        className: 'chatbot-analysis-button'
+      },
+      '요금제 추천 모드 종료': {
+        emoji: '❌',
+        className: 'chatbot-cancel-button'
+      },
+      '개인 맞춤 추천': {
+        emoji: '⭐',
+        className: 'chatbot-recommend-button'
+      },
+      '취소': {
+        emoji: '❌',
+        className: 'chatbot-cancel-button'
+      },
+      '다시 시작': {
+        emoji: '🔄',
+        className: 'chatbot-restart-button'
+      },
+      '추천받기': {
+        emoji: '💎',
+        className: 'chatbot-premium-button'
+      }
+      // 필요한 만큼 추가...
+    };
+
+    // 기본값
+    const defaultConfig = {
+      emoji: button.type === 'EVENT' ? '🧠' : '🎯',
+      className: button.type === 'EVENT' ? 'chatbot-event-button' : 'chatbot-input-button'
+    };
+
+    return configs[button.label] || defaultConfig;
+  };
 
   // 스크롤을 맨 아래로 이동하는 함수
   const scrollToBottom = () => {
@@ -110,7 +149,7 @@ const ChatbotPage = () => {
     return localStorage.getItem('accessToken');
   };
 
-  // 공통 메시지 전송 함수 (인증 헤더 추가) - sessionId를 의존성에 추가
+  // 공통 메시지 전송 함수 (인증 헤더 추가)
   const sendMessage = useCallback(async (userMessage, additionalData = {}) => {
     if (!isLoggedIn) {
       setAuthError(true);
@@ -121,13 +160,6 @@ const ChatbotPage = () => {
     if (!token) {
       console.error('인증 토큰이 없습니다.');
       setAuthError(true);
-      return;
-    }
-
-    // sessionId가 없으면 대기
-    if (!sessionId) {
-      console.warn('sessionId가 아직 생성되지 않았습니다.');
-      setPendingMessage(userMessage); // 메시지를 저장해둠
       return;
     }
 
@@ -238,27 +270,29 @@ const ChatbotPage = () => {
       setWaitingMessage('');
       setIsWaitingForMainReply(false);
     }
-  }, [isLoggedIn, sessionId]); // sessionId를 의존성에 추가
+  }, [isLoggedIn, sessionId]);
 
-  // 세션 ID 생성 및 URL 파라미터 처리
+  // 세션 ID 생성 및 URL 파라미터 처리 (로그인된 경우에만)
   useEffect(() => {
     if (isLoggedIn && !isInitialized) {
       const newSessionId = crypto.randomUUID();
       setSessionId(newSessionId);
-      setIsInitialized(true);
+      setIsInitialized(true); // 초기화 완료 표시
       console.log('🆕 생성된 sessionId:', newSessionId);
 
-      // URL 파라미터에서 메시지 확인
+      // URL 파라미터에서 메시지 확인하고 자동 전송
       const urlParams = new URLSearchParams(window.location.search);
       const initialMessage = urlParams.get('message');
       
       if (initialMessage) {
-        // URL에서 message 파라미터 제거
+        // URL에서 message 파라미터 제거 (브라우저 히스토리 업데이트)
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
         
-        // 대기 메시지로 저장
-        setPendingMessage(decodeURIComponent(initialMessage));
+        // 약간의 지연 후 메시지 자동 전송
+        setTimeout(() => {
+          sendMessage(decodeURIComponent(initialMessage));
+        }, 1000);
       }
 
       const handleBeforeUnload = (e) => {
@@ -269,16 +303,7 @@ const ChatbotPage = () => {
       window.addEventListener('beforeunload', handleBeforeUnload);
       return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }
-  }, [isLoggedIn, isInitialized]);
-
-  // sessionId가 생성되고 대기 중인 메시지가 있으면 전송
-  useEffect(() => {
-    if (sessionId && pendingMessage && isLoggedIn) {
-      console.log('📨 대기 중이던 메시지 전송:', pendingMessage);
-      sendMessage(pendingMessage);
-      setPendingMessage(''); // 전송 후 초기화
-    }
-  }, [sessionId, pendingMessage, isLoggedIn, sendMessage]);
+  }, [isLoggedIn, isInitialized, sendMessage]); // isInitialized 추가
 
   const handleSend = async () => {
     if (!input.trim() || !isLoggedIn) return;
@@ -412,6 +437,65 @@ const ChatbotPage = () => {
     );
   }
 
+const handleEventButton = async (button) => {
+  clearAllButtons();
+
+  try {
+    const token = getAuthToken();
+
+    const response = await fetch(button.value, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-AUTH-TOKEN': token,
+      },
+      body: JSON.stringify({
+        sessionId,
+        userId: userInfo?.id
+      }),
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    const newConversation = {
+      id: Date.now(),
+      userMessage: '', // 이벤트 버튼은 사용자 메시지 없음
+      botMessages: [],
+      buttons: [],
+      cards: [],
+      lineSelectButton: null,
+      hasError: false
+    };
+
+    setConversations(prev => [...prev, newConversation]);
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.trim()) {
+          try {
+            const parsed = JSON.parse(line.trim());
+            updateCurrentConversation(newConversation.id, parsed);
+          } catch {
+            updateCurrentConversation(newConversation.id, { message: line.trim() });
+          }
+        }
+      }
+    }
+
+  } catch (e) {
+    console.error("이벤트 버튼 요청 실패:", e);
+  }
+};
+
+
+
   // 메시지 렌더링
   const renderMessage = (content, isUser, key) => {
     return (
@@ -515,14 +599,17 @@ const ChatbotPage = () => {
       );
     }
     
-    // 버튼들
+    
+    // 버튼들 (커스터마이징 적용)
     if (conversation.buttons.length > 0) {
       const hasInputDataButton = conversation.buttons.some(btn => btn.type === 'INPUT_DATA');
-      
+
       elements.push(
         <div key={`buttons-${conversation.id}`} className="chatbot-buttons-container">
           <div className="chatbot-buttons-list">
             {conversation.buttons.map((btn, idx) => {
+              const buttonConfig = getButtonConfig(btn);
+              
               if (btn.type === 'URL') {
                 return (
                   <a
@@ -542,38 +629,39 @@ const ChatbotPage = () => {
                     key={`btn-${conversation.id}-${idx}`}
                     onClick={() => handleButtonClick(btn)}
                     disabled={loading}
-                    className={`chatbot-input-button ${loading ? 'chatbot-btn-disabled' : ''}`}
+                    className={`${buttonConfig.className} ${loading ? 'chatbot-btn-disabled' : ''}`}
                   >
-                    <span className="chatbot-btn-emoji">🎯</span>
+                    <span className="chatbot-btn-emoji">{buttonConfig.emoji}</span>
+                    {btn.label}
+                  </button>
+                );
+              } else if (btn.type === 'EVENT') {
+                return (
+                  <button
+                    key={`btn-${conversation.id}-${idx}`}
+                    onClick={() => handleEventButton(btn)}
+                    disabled={loading}
+                    className={`${buttonConfig.className} ${loading ? 'chatbot-btn-disabled' : ''}`}
+                  >
+                    <span className="chatbot-btn-emoji">{buttonConfig.emoji}</span>
                     {btn.label}
                   </button>
                 );
               }
               return null;
             })}
-            
-            {hasInputDataButton && (
-              <button
-                onClick={handleCancel}
-                disabled={loading}
-                className={`chatbot-cancel-button ${loading ? 'chatbot-btn-disabled' : ''}`}
-              >
-                <X className="chatbot-cancel-icon" />
-                취소
-              </button>
-            )}
           </div>
         </div>
       );
     }
-    
+
     return elements;
   };
 
   return (
     <div className="chatbot-page-container">
       {/* Chat Container */}
-      <div className="chatbot-main-container">
+      <div className="chatbot-main-container">{/* 기존 내용들... */}
         {/* Welcome Section */}
         <div className="chatbot-welcome-section">
           <div className="chatbot-welcome-icon">

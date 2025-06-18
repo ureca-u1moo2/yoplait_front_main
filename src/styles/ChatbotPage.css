@@ -152,6 +152,75 @@
   text-align: center;
 }
 
+.chatbot-event-button {
+display: flex;
+  align-items: center;
+  background: rgba(252, 70, 240, 0.1);
+  border: 1px solid #fe497d;
+  color: #fe497d;
+  text-decoration: none;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.chatbot-event-button:hover:not(.chatbot-btn-disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3); /* 동일한 호버 효과 */
+}
+/* 성향 분석 버튼 */
+.chatbot-analysis-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.chatbot-analysis-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 취소/종료 버튼 */
+.chatbot-cancel-button {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.chatbot-cancel-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* 추천 버튼 */
+.chatbot-recommend-button {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  border: none;
+  color: #2d3436;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(253, 203, 110, 0.3);
+}
+
+.chatbot-recommend-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(253, 203, 110, 0.4);
+}
+
 /* 메시지 행 */
 .chatbot-message-row {
   display: flex;
