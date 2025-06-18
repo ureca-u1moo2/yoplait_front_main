@@ -1078,3 +1078,28 @@ display: flex;
 .chatbot-tips-text strong {
   color: #1d4ed8;
 }
+
+
+.chatbot-mic-button {
+  background-color: transparent;
+  border: none;
+  font-size: 22px;
+  margin-left: 8px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+.chatbot-mic-button:hover {
+  color: #f06292;
+}
+.chatbot-mic-recording {
+  color: red;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
