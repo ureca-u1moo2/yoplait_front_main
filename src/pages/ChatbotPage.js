@@ -21,6 +21,8 @@ const ChatbotPage = () => {
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const navigate = useNavigate();
+  const [suggestions, setSuggestions] = useState([]);
+  const [debounceTimer, setDebounceTimer] = useState(null);
 
   // 버튼별 커스텀 설정을 반환하는 함수
   const getButtonConfig = (button) => {
@@ -658,6 +660,29 @@ const handleEventButton = async (button) => {
     return elements;
   };
 
+  // 기존 onChange 핸들러를 수정
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInput(value);
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    if (value.trim().length >= 6) {
+      const timer = setTimeout(async () => {
+        try {
+          const response = await fetch(`http://localhost:8080/api/questions/search?q=${encodeURIComponent(value)}`);
+          const data = await response.json();
+          setSuggestions(Array.isArray(data) ? data : []);
+        } catch (error) {
+          console.error('추천 질문 검색 실패:', error);
+        }
+      }, 500);
+      setDebounceTimer(timer);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
   return (
     <div className="chatbot-page-container">
       {/* Chat Container */}
@@ -756,40 +781,52 @@ const handleEventButton = async (button) => {
         <div className="chatbot-input-container">
           <div className="chatbot-input-wrapper">
             <input
-              type="text"
-              placeholder={hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className={`chatbot-input ${hasActiveButtons ? 'chatbot-input-disabled' : ''}`}
-              disabled={loading || hasActiveButtons}
+                type="text"
+                placeholder={hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
+                value={input}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                className={`chatbot-input ${hasActiveButtons ? 'chatbot-input-disabled' : ''}`}
+                disabled={loading || hasActiveButtons}
             />
             <button
-              onClick={handleSend}
-              disabled={loading || !input.trim() || hasActiveButtons}
-              className={`chatbot-send-button ${
-                (loading || !input.trim() || hasActiveButtons) ? 'chatbot-send-disabled' : ''
-              }`}
+                onClick={handleSend}
+                disabled={loading || !input.trim() || hasActiveButtons}
+                className={`chatbot-send-button ${
+                    (loading || !input.trim() || hasActiveButtons) ? 'chatbot-send-disabled' : ''
+                }`}
             >
               {loading ? (
-                <div className="chatbot-send-loading">
-                  <div className="chatbot-send-spinner"></div>
-                  전송중
-                </div>
+                  <div className="chatbot-send-loading">
+                    <div className="chatbot-send-spinner"></div>
+                    전송중
+                  </div>
               ) : (
-                <div className="chatbot-send-content">
-                  <Send className="chatbot-send-icon" />
-                  전송
-                </div>
+                  <div className="chatbot-send-content">
+                    <Send className="chatbot-send-icon" />
+                    전송
+                  </div>
               )}
             </button>
           </div>
         </div>
 
+
         {/* Footer Tips */}
-        <div className="chatbot-tips">
-          <p>💡 팁: "요금제 추천", "데이터 많이 쓰는 요금제", "전체 요금제" 등을 물어보세요!</p>
-        </div>
+        {suggestions.length > 0 && (
+            <div className="chatbot-tips">
+              <p className="chatbot-tips-title">💡 이런 문장은 어때요?</p>
+              <p className="chatbot-tips-text">
+                {suggestions.map((s, idx) => (
+                    <span key={idx}>
+                        <strong>“{s}”</strong>
+                        {idx < suggestions.length - 1 && ', '}
+                    </span>
+                ))}
+              </p>
+            </div>
+        )}
+
       </div>
 
       {/* Background Elements */}
