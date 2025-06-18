@@ -39,7 +39,7 @@ const UsageSection = () => {
         headers: { 'X-AUTH-TOKEN': token }
       });
 
-      const lines = res.data.data; // ✅ 이게 누락되어 있었음
+      const lines = res.data.data; 
       const phones = lines.map(line => line.phoneNumber); // 전화번호 목록 추출
 
       const map = {};
