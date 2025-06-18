@@ -739,3 +739,39 @@ html, body {
   line-height: 1;
   opacity: 0.9;
 }
+
+/* 페이지네이션 css */
+.maid-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.maid-page-btn {
+  padding: 8px 16px;
+  border: 2px solid #f9a8d4; /* 연핑크 테두리 */
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4); /* 핑크 그라데이션 */
+  color: #be185d;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.2);
+}
+
+.maid-page-btn:hover {
+  background: linear-gradient(135deg, #f9a8d4, #f472b6); /* 진한 핑크로 호버 효과 */
+  color: white;
+}
+
+.maid-page-btn.active {
+  background: #ec4899;
+  color: white;
+  border-color: #ec4899;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.6);
+}
+
