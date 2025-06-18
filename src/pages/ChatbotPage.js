@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import 'styles/ChatbotPage.css'; // 전용 CSS 파일 import
+import { encodeWAV, downsampleBuffer } from '../utils/audioUtils';
+import { Mic, MicOff } from 'lucide-react';
+
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
@@ -23,6 +26,10 @@ const ChatbotPage = () => {
   const navigate = useNavigate();
   const [suggestions, setSuggestions] = useState([]);
   const [debounceTimer, setDebounceTimer] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const bufferRef = useRef([]);
+
 
   // 버튼별 커스텀 설정을 반환하는 함수
   const getButtonConfig = (button) => {
@@ -683,10 +690,75 @@ const handleEventButton = async (button) => {
     }
   };
 
+  // 음성 녹음 시작
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      const audioChunks = [];
+      bufferRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioCtx = new AudioContext();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        const downsampled = downsampleBuffer(audioBuffer, 16000);
+        const wavBlob = encodeWAV(downsampled, 16000);
+
+        const formData = new FormData();
+        formData.append('file', new Blob([wavBlob], { type: 'audio/wav' }), 'voice.wav');
+
+        const token = getAuthToken();
+
+        const res = await fetch('http://localhost:8080/api/stt', {
+          method: 'POST',
+          headers: {
+            'X-AUTH-TOKEN': token,
+          },
+          body: formData,
+        });
+
+        const resultText = await res.text();
+        try {
+          const parsed = JSON.parse(resultText);
+          const transcript = parsed.transcript?.trim();
+          if (transcript) {
+            setInput(transcript);
+            // await sendMessage(transcript); 음성 번역 시 바로 전송
+          }
+        } catch (e) {
+          console.error("STT 응답 파싱 실패:", e);
+        }
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('🎙️ 음성 녹음 오류:', err);
+    }
+  };
+
+  // 음성 녹음 중지
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   return (
     <div className="chatbot-page-container">
       {/* Chat Container */}
-      <div className="chatbot-main-container">{/* 기존 내용들... */}
+      <div className="chatbot-main-container">
         {/* Welcome Section */}
         <div className="chatbot-welcome-section">
           <div className="chatbot-welcome-icon">
@@ -780,6 +852,14 @@ const handleEventButton = async (button) => {
         {/* Input Section */}
         <div className="chatbot-input-container">
           <div className="chatbot-input-wrapper">
+            <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`chatbot-mic-button ${isRecording ? 'chatbot-mic-recording' : ''}`}
+                title={isRecording ? '녹음 중지' : '음성 입력'}
+            >
+              {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </button>
+
             <input
                 type="text"
                 placeholder={hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
