@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle, X, AlertCircle } from 'lucide-react';
+import 'styles/NotificationContext.css';
 
 const NotificationContext = createContext();
 export const useNotification = () => useContext(NotificationContext);
@@ -16,6 +17,7 @@ export const NotificationProvider = ({ children }) => {
 
   const closeNotification = () => setNotification(null);
 
+  
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       {children}
@@ -56,3 +58,4 @@ export const NotificationProvider = ({ children }) => {
     </NotificationContext.Provider>
   );
 };
+
