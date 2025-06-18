@@ -170,7 +170,7 @@ export const handleLogout = async () => {
 
 // 로그인 리다이렉트 처리
 export const handleLoginSuccess = (loginResponse) => {
-  const { accessToken, refreshToken } = loginResponse.data;
+  const { accessToken, refreshToken } = loginResponse.data.token;
   const { userDto } = loginResponse.data;
   
   // 토큰 저장
