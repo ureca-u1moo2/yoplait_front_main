@@ -31,7 +31,7 @@ const PlanCard = ({ plan, onCancel, onReview }) => {
         <span className="pink-icon">
           <DollarSign size={16} />
         </span>
-        <p className="plan-price">할인가: {plan.discountedPrice}원</p>
+        <p className="plan-price">가격: {plan.discountedPrice}원</p>
       </div>
 
       {/* 버튼 */}
