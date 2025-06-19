@@ -154,7 +154,8 @@ function PlanDetailContent() {
           </div>
           <div className="maid-info-card">
             <div className="maid-info-label"><span style={pinkIconStyle}><MessageSquare size={18} /></span>문자</div>
-            <div className="maid-info-value">{plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}</div>
+           <div className="maid-info-value">{plan.smsAmount >= 15000 ? `기본제공(${plan.smsAmount}건)` : `${plan.smsAmount}건`}</div>
+
           </div>
           {plan.specialFeatures && (
             <div className="maid-info-card">

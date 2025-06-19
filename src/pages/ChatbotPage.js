@@ -375,12 +375,22 @@ const ChatbotPage = () => {
     return new Intl.NumberFormat('ko-KR').format(price);
   };
 
-  const formatData = (amount) => {
-    if (amount >= 1024) {
-      return `${(amount / 1024).toFixed(1)}GB`;
-    }
-    return `${amount}MB`;
-  };
+const formatData = (amount) => {
+  if (amount === -1 || amount === 99999) return '무제한';
+  if (amount >= 1024) return `${(amount / 1024).toFixed(1)}GB`;
+  return `${amount}MB`;
+};
+
+
+const formatCall = (amount) => {
+  if (amount === -1 || amount === 99999) return '무제한';
+  return `${amount}분`;
+};
+
+const formatSms = (amount) => {
+  if (amount >= 15000) return `기본제공(${amount}건)`;
+  return `${amount}건`;
+};
 
   // 점점점 애니메이션 컴포넌트
   const TypingIndicator = () => {
@@ -543,23 +553,19 @@ const handleEventButton = async (button) => {
           </div>
           
           <div className="chatbot-detail-row">
-            <span className="chatbot-detail-label">데이터:</span>
-            <span className="chatbot-detail-value">{formatData(value.dataAmount)}</span>
-          </div>
-          
-          <div className="chatbot-detail-row">
-            <span className="chatbot-detail-label">통화:</span>
-            <span className="chatbot-detail-value">
-              {value.callAmount === 99999 ? '무제한' : `${value.callAmount}분`}
-            </span>
-          </div>
-          
-          <div className="chatbot-detail-row">
-            <span className="chatbot-detail-label">문자:</span>
-            <span className="chatbot-detail-value">
-              {value.smsAmount === 99999 ? '무제한' : `${value.smsAmount}건`}
-            </span>
-          </div>
+  <span className="chatbot-detail-label">데이터:</span>
+  <span className="chatbot-detail-value">{formatData(value.dataAmount)}</span>
+</div>
+
+<div className="chatbot-detail-row">
+  <span className="chatbot-detail-label">통화:</span>
+  <span className="chatbot-detail-value">{formatCall(value.callAmount)}</span>
+</div>
+
+<div className="chatbot-detail-row">
+  <span className="chatbot-detail-label">문자:</span>
+  <span className="chatbot-detail-value">{formatSms(value.smsAmount)}</span>
+</div>
         </div>
       </div>
     );

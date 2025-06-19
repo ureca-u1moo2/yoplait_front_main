@@ -235,7 +235,9 @@ function PlanListPage() {
                       <span style={pinkIconStyle}>
                         <MessageSquare size={16} />
                       </span>
-                      <span>문자: {plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}</span>
+                      <span>
+  문자: {plan.smsAmount >= 15000 ? `기본제공(${plan.smsAmount}건)` : `${plan.smsAmount}건`}
+</span>
                     </div>
                     {plan.specialFeatures && (
                       <div className="maid-info-item">

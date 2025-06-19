@@ -527,7 +527,8 @@ const PlanCompareInner = () => {
                     <div className="compare-info-icon"><MessageSquare size={20} /></div>
                     <div className="compare-info-content">
                       <div className="compare-info-label">문자</div>
-                      <div className="compare-info-value">{plan.smsAmount === -1 ? '무제한' : `${plan.smsAmount}건`}</div>
+                     <div className="compare-info-value">{plan.smsAmount >= 15000 ? `기본제공(${plan.smsAmount}건)` : `${plan.smsAmount}건`}</div>
+
                     </div>
                   </div>
                   {plan.specialFeatures && (
