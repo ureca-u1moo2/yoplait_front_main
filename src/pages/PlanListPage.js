@@ -32,6 +32,9 @@ function PlanListPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [priceRange, setPriceRange] = useState('all');
   const navigate = useNavigate();
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
     // GB 파싱
   const formatDataAmount = (amount) => {
@@ -41,19 +44,35 @@ function PlanListPage() {
   };
 
 
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   fetch(`${API_BASE_URL}/api/plans?sortBy=${sortBy}`)
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setPlans(data.data || []);
+  //       setIsLoading(false);
+  //     })
+  //     .catch(err => {
+  //       console.error('Failed to fetch plans:', err);
+  //       setIsLoading(false);
+  //     });
+  // }, [sortBy]);
+
+  // 페이징
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`${API_BASE_URL}/api/plans?sortBy=${sortBy}`)
-      .then(res => res.json())
-      .then(data => {
-        setPlans(data.data || []);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to fetch plans:', err);
-        setIsLoading(false);
-      });
-  }, [sortBy]);
+  setIsLoading(true);
+  fetch(`${API_BASE_URL}/api/plans/filter?sortBy=${sortBy}&page=${page}&size=${pageSize}`)
+    .then(res => res.json())
+    .then(data => {
+      setPlans(data.data.content || []);
+      setTotalPages(data.data.totalPages || 1);
+      setIsLoading(false);
+    })
+    .catch(err => {
+      console.error('Failed to fetch plans:', err);
+      setIsLoading(false);
+    });
+}, [sortBy, page, pageSize]);
 
   const handleCompare = () => {
     if (selectedPlans.length >= 2) {
@@ -272,6 +291,19 @@ function PlanListPage() {
           {searchTerm && ` • "${searchTerm}" 검색 결과`}
           {priceRange !== 'all' && ` • ${priceRange === 'low' ? '3만원 미만' : priceRange === 'mid' ? '3-6만원' : '6만원 이상'} 필터 적용`}
         </p>
+      </div>
+
+      {/* 페이지네이션 UI 추가 */}
+      <div className="maid-pagination">
+        {[...Array(totalPages)].map((_, idx) => (
+          <button
+            key={idx}
+            className={`maid-page-btn ${page === idx ? 'active' : ''}`}
+            onClick={() => setPage(idx)}
+          >
+            {idx + 1}
+          </button>
+        ))}
       </div>
     </div>
   );

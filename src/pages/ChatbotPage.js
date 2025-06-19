@@ -768,6 +768,7 @@ const handleEventButton = async (button) => {
           <div className="chatbot-header-center">
             <MessageCircle className="chatbot-header-bot-icon" />
             <h1 className="chatbot-header-title">AI 챗봇</h1>
+
           </div>
         </div>
       </div>
