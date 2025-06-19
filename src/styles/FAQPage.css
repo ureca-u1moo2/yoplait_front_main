@@ -1,7 +1,6 @@
 /* FAQ 페이지 스타일 */
 .faq-page-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fdf2f8, #fce7f3, #fbcfe8);
   padding: 2rem;
   position: relative;
   overflow-x: hidden;
@@ -122,7 +121,7 @@
 
 /* 검색 및 필터 카드 */
 .faq-search-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3, #fbcfe8);
   backdrop-filter: blur(10px);
   border: 1px solid #f9a8d4;
   border-radius: 25px;
@@ -217,7 +216,7 @@
 }
 
 .faq-item {
-  background: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3, #fbcfe8);
   backdrop-filter: blur(10px);
   border: 1px solid #f9a8d4;
   border-radius: 20px;
@@ -282,7 +281,7 @@
 .faq-answer {
   display: flex;
   gap: 1rem;
-  padding: 0 1.5rem 1.5rem 1.5rem;
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
   border-top: 1px solid rgba(244, 114, 182, 0.2);
   animation: slideDown 0.3s ease;
 }
@@ -318,6 +317,7 @@
   line-height: 1.6;
   font-size: 1rem;
   padding-top: 0.25rem;
+  font-weight: 500;
 }
 
 /* 빈 상태 */
@@ -398,7 +398,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(252, 231, 243, 0.5);
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3, #fbcfe8);
   border: 1px solid #f9a8d4;
   border-radius: 20px;
   transition: all 0.3s ease;
