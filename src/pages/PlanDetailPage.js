@@ -154,7 +154,7 @@ function PlanDetailContent() {
           </div>
           <div className="maid-info-card">
             <div className="maid-info-label"><span style={pinkIconStyle}><MessageSquare size={18} /></span>문자</div>
-           <div className="maid-info-value">{plan.smsAmount >= 15000 ? `기본제공(${plan.smsAmount}건)` : `${plan.smsAmount}건`}</div>
+           <div className="maid-info-value">{plan.smsAmount >= 15000 ? `기본제공` : `${plan.smsAmount}건`}</div>
 
           </div>
           {plan.specialFeatures && (
@@ -210,12 +210,78 @@ function PlanDetailContent() {
         )}
       </div>
 
-      {aiSummary && (
+      {/* {aiSummary && (
         <div className="ai-summary-box">
           <h3 className="ai-title">💡 AI 요금제 리뷰 요약</h3>
           <pre className="ai-summary-text">{aiSummary}</pre>
         </div>
-      )}
+      )} */}
+      {aiSummary && (
+  <div style={{
+    marginTop: '2rem',
+    marginBottom: '2rem',
+    padding: '2rem',
+    borderRadius: '20px',
+    background: 'linear-gradient(135deg, #fef7ff 0%, #fce7f3 50%, #f9a8d4 100%)',
+    border: '2px solid #f472b6',
+    boxShadow: '0 8px 32px rgba(244, 114, 182, 0.15)',
+    position: 'relative',
+    overflow: 'hidden'
+  }}>
+    {/* 딸기 이모지 장식 */}
+    <div style={{
+      position: 'absolute',
+      top: '-10px',
+      right: '-10px',
+      fontSize: '3rem',
+      opacity: 0.1,
+      transform: 'rotate(15deg)'
+    }}>🍓</div>
+
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '1.5rem',
+      gap: '0.75rem'
+    }}>
+      <span style={{
+        color: '#fff',
+        background: 'linear-gradient(135deg, #ec4899, #be185d)',
+        padding: '10px',
+        borderRadius: '10px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        💖
+      </span>
+      <h3 style={{
+        margin: 0,
+        fontSize: '1.5rem',
+        fontWeight: '700',
+        color: '#be185d',
+        textShadow: '0 2px 4px rgba(190, 24, 93, 0.1)'
+      }}>
+        AI 요플레의 리뷰 요약 🍓
+      </h3>
+    </div>
+
+    <div style={{
+      whiteSpace: 'pre-wrap',
+      color: '#831843',
+      fontSize: '1.05rem',
+      lineHeight: '1.6',
+      fontWeight: '500',
+      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+      padding: '1.5rem',
+      borderRadius: '15px',
+      border: '1px solid rgba(244, 114, 182, 0.3)'
+    }}>
+      {aiSummary}
+    </div>
+  </div>
+)}
+
 
       <div className="maid-review-section">
         <h3 className="maid-review-title">요금제 리뷰</h3>
