@@ -767,8 +767,9 @@ const handleEventButton = async (button) => {
           
           <div className="chatbot-header-center">
             <MessageCircle className="chatbot-header-bot-icon" />
-            <h1 className="chatbot-header-title">AI 챗봇</h1>
-
+            <div>
+              <h1 className="chatbot-header-title">AI 챗봇</h1>
+            </div>
           </div>
         </div>
       </div>
@@ -909,7 +910,6 @@ const handleEventButton = async (button) => {
 
       </div>
 
-      {/* Background Elements 삭제됨 */}
       <div className="chatbot-bg-emoji chatbot-bg-emoji-1">🍓</div>
       <div className="chatbot-bg-emoji chatbot-bg-emoji-2">🥛</div>
     </div>

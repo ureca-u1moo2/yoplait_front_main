@@ -6,129 +6,314 @@
   background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 25%, #fbb6ce 100%);
   position: relative;
   overflow: hidden;
-}
+  }
 
-/* 메인 컨테이너 */
 .chatbot-main-container {
   max-width: 4xl;
-  margin: 0 auto;
+  margin: 0 auto; /* 좌우만 auto */
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; /* 전체 높이 */
   position: relative;
   z-index: 10;
+  padding-top: 64px; /* 헤더 높이 + 기본 패딩 */
 }
 
-/* Chatbot Header Styles - 기존 ChatbotPage.css에 추가할 스타일 */
+/* 귀여운 채팅봇 컨셉 헤더 스타일 */
 
-/* 헤더 스타일 */
+/* 헤더 전체 스타일 - 부드럽고 둥글게 */
 .chatbot-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.95) 0%, rgba(255, 218, 237, 0.95) 50%, rgba(252, 231, 243, 0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 2px 8px 0 rgba(236, 72, 153, 0.08);
-  border-bottom: 1px solid rgba(236, 72, 153, 0.1);
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.15);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
   z-index: 9999;
   height: 64px;
   display: flex;
   align-items: center;
+  margin: 0;
+  border-radius: 0 0 20px 20px; /* 하단만 둥글게 */
 }
 
+/* 헤더 콘텐츠 */
 .chatbot-header-content {
-  /* max-width: 1200px; */
-  /* margin: 0 auto; */
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 0.75rem; /* 좌우 적당한 패딩 */
+  padding: 0 1.5rem;
+  position: relative;
 }
 
-/* 메인으로 버튼 */
+/* 메인으로 버튼 - 귀여운 스타일 */
 .chatbot-header-home-btn {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.05);
-  color: #374151;
-  border: none;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #ec4899;
+  border: 2px solid rgba(236, 72, 153, 0.3);
+  border-radius: 20px;
   padding: 8px 16px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   text-decoration: none;
-  margin-left: 3rem; /* 왼쪽 넉넉한 여백 */
+  box-shadow: 0 2px 10px rgba(236, 72, 153, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
 .chatbot-header-home-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3);
+  border-color: #ec4899;
+}
+
+.chatbot-header-home-btn:active {
+  transform: translateY(0) scale(1);
 }
 
 .chatbot-header-home-icon {
   width: 18px;
   height: 18px;
   margin-right: 6px;
+  color: #ec4899;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
 }
 
-/* 헤더 중앙 타이틀 */
+/* 헤더 중앙 - AI 봇 아이덴티티 */
 .chatbot-header-center {
   display: flex;
   align-items: center;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 20px;
+  border-radius: 25px;
+  border: 2px solid rgba(236, 72, 153, 0.2);
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .chatbot-header-bot-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   color: #ec4899;
-  margin-right: 8px;
+  margin-right: 10px;
+  animation: pulse 2s infinite;
+  filter: drop-shadow(0 2px 4px rgba(236, 72, 153, 0.3));
 }
 
 .chatbot-header-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ec4899, #f43f5e);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
   margin: 0;
   letter-spacing: -0.025em;
+  text-shadow: none;
+  position: relative;
 }
 
-/* 사용자 정보 */
+.chatbot-header-title::after {
+  content: "🤖✨";
+  position: absolute;
+  right: -25px;
+  top: -2px;
+  font-size: 14px;
+  animation: bounce 1.5s infinite;
+}
+
+/* 사용자 정보 - 귀여운 뱃지 스타일 */
 .chatbot-header-user {
   display: flex;
   align-items: center;
-  margin-left: 0;
 }
 
 .chatbot-header-username {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
-  padding: 6px 12px;
-  background: rgba(0, 0, 0, 0.04);
+  font-size: 13px;
+  color: #ec4899;
+  font-weight: 600;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 2px solid rgba(236, 72, 153, 0.3);
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.15);
+  position: relative;
 }
 
-/* 메인 컨테이너 상단 여백 추가 */
-.chatbot-main-container {
-  max-width: 4xl;
-  margin: 0 auto;
-  padding: 1rem;
+.chatbot-header-username::before {
+  content: "👋 ";
+  margin-right: 4px;
+}
+
+/* 로딩 상태 표시 (선택사항) */
+.chatbot-header-loading {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - 64px); /* 헤더 높이만큼 제외 */
-  position: relative;
-  z-index: 10;
-  margin-top: 64px; /* 헤더 높이만큼 상단 여백 */
+  align-items: center;
+  font-size: 12px;
+  color: #ec4899;
+}
+
+.chatbot-header-loading-dot {
+  width: 4px;
+  height: 4px;
+  background: #ec4899;
+  border-radius: 50%;
+  margin: 0 1px;
+  animation: loading 1.4s infinite ease-in-out;
+}
+
+.chatbot-header-loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.chatbot-header-loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* 애니메이션들 */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  60% { transform: translateY(-2px); }
+}
+
+@keyframes loading {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .chatbot-header {
+    height: 56px;
+    border-radius: 0 0 15px 15px;
+  }
+
+  .chatbot-header-content {
+    padding: 0 1rem;
+  }
+
+  .chatbot-header-home-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 15px;
+  }
+
+  .chatbot-header-home-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+
+  .chatbot-header-center {
+    padding: 6px 16px;
+    border-radius: 20px;
+  }
+
+  .chatbot-header-title {
+    font-size: 16px;
+  }
+
+  .chatbot-header-title::after {
+    font-size: 12px;
+    right: -20px;
+  }
+
+  .chatbot-header-bot-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+
+  .chatbot-header-username {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatbot-header {
+    height: 52px;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .chatbot-header-content {
+    padding: 0 0.75rem;
+  }
+
+  .chatbot-header-user {
+    display: none; /* 작은 화면에서는 사용자명 숨기기 */
+  }
+
+  .chatbot-header-home-btn span {
+    display: none; /* 매우 작은 화면에서는 텍스트 숨기기 */
+  }
+
+  .chatbot-header-home-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 18px;
+  }
+
+  .chatbot-header-home-icon {
+    margin-right: 0;
+    width: 18px;
+    height: 18px;
+  }
+
+  .chatbot-header-title {
+    font-size: 15px;
+  }
+
+  .chatbot-header-title::after {
+    display: none; /* 작은 화면에서는 이모지 숨기기 */
+  }
+
+  .chatbot-header-center {
+    padding: 5px 12px;
+  }
+}
+
+/* 특별한 효과 - 헤더에 떠다니는 파티클 (선택사항) */
+.chatbot-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px, 80px 80px, 60px 60px;
+  animation: float 10s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
+  100% { background-position: 100% 100%, -100% 100%, 50% -100%; }
 }
 
 /* 환영 섹션 패딩 조정 */
@@ -177,6 +362,7 @@
   .chatbot-main-container {
     height: calc(100vh - 56px);
     margin-top: 56px;
+    /* 또는 padding-top: calc(56px + 0.5rem); */
   }
 
   .chatbot-header-user {
@@ -192,6 +378,7 @@
   .chatbot-main-container {
     height: calc(100vh - 52px);
     margin-top: 52px;
+    /* 또는 padding-top: calc(52px + 0.5rem); */
   }
 
   .chatbot-header-user {
@@ -278,7 +465,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 1rem 0;
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 150px);
 }
 
 /* 빈 상태 */
