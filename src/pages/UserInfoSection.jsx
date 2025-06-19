@@ -32,7 +32,7 @@ const UserInfoSection = () => {
       <div className="mypage-user-info">
         <p><strong>이름:</strong> {userInfo.name}</p>
         <p><strong>이메일:</strong> {userInfo.email}</p>
-        <p><strong>성별:</strong> {userInfo.gender === 'MALE' ? '남성' : '여성'}</p>
+        <p><strong>성별:</strong> {userInfo.gender === '남성' ? '남성' : '여성'}</p>
         <p><strong>생년월일:</strong> {userInfo.birth}</p>
         <p><strong>멤버십 등급:</strong> {userInfo.membershipName}</p>
       </div>
