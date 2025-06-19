@@ -388,7 +388,7 @@ const formatCall = (amount) => {
 };
 
 const formatSms = (amount) => {
-  if (amount >= 15000) return `기본제공(${amount}건)`;
+  if (amount >= 15000) return `기본제공`;
   return `${amount}건`;
 };
 
