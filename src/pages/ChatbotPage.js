@@ -507,7 +507,15 @@ const handleEventButton = async (button) => {
     return (
       <div key={key} className={`chatbot-message-row ${isUser ? 'chatbot-message-user' : 'chatbot-message-bot'}`}>
         <div className={`chatbot-message-bubble ${isUser ? 'chatbot-user-bubble' : 'chatbot-bot-bubble'}`}>
-          {isUser ? content : <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>}
+          {isUser ? content : <ReactMarkdown
+  remarkPlugins={[remarkGfm]}
+  components={{
+    p: ({ children }) => <p>{children}</p>,
+  }}
+>
+  {content.replace(/\n/g, '  \n')}
+</ReactMarkdown>
+}
         </div>
       </div>
     );
