@@ -3,10 +3,16 @@
 import React from 'react';
 import { Smartphone, Calendar, DollarSign } from 'lucide-react';
 import 'styles/PlanCard.css'; 
+import { useNavigate } from 'react-router-dom';
 
 const PlanCard = ({ plan, onCancel, onReview }) => {
+  const navigate = useNavigate();
   return (
-    <div className="plan-card">
+    <div
+      className="plan-card"
+      onClick={() => navigate(`/plans/${plan.planId}`)}
+      style={{ cursor: 'pointer' }}
+    >
       {/* 전화번호 */}
       <div className="plan-info-item">
         <span className="pink-icon">
@@ -36,8 +42,10 @@ const PlanCard = ({ plan, onCancel, onReview }) => {
 
       {/* 버튼 */}
       <div className="plan-buttons">
-        <button onClick={() => onCancel(plan.lineId)}>요금제 해지</button>
-        <button onClick={() => onReview(plan)}>리뷰 작성</button>
+        {/* <button onClick={() => onCancel(plan.lineId)}>요금제 해지</button>
+        <button onClick={() => onReview(plan)}>리뷰 작성</button> */}
+        <button onClick={(e) => { e.stopPropagation(); onCancel(plan.lineId); }}>요금제 해지</button>
+        <button onClick={(e) => { e.stopPropagation(); onReview(plan); }}>리뷰 작성</button>
       </div>
     </div>
   );

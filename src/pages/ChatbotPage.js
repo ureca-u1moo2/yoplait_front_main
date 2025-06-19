@@ -850,6 +850,17 @@ const handleEventButton = async (button) => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* 오디오 시각화 */}
+        {isRecording && (
+            <div className="audio-visualizer">
+              <div className="audio-bar"></div>
+              <div className="audio-bar"></div>
+              <div className="audio-bar"></div>
+              <div className="audio-bar"></div>
+              <div className="audio-bar"></div>
+            </div>
+        )}
+
         {/* Input Section */}
         <div className="chatbot-input-container">
           <div className="chatbot-input-wrapper">
@@ -863,18 +874,18 @@ const handleEventButton = async (button) => {
 
             <input
                 type="text"
-                placeholder={hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
+                placeholder={isRecording ? "녹음 중입니다..." : hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
                 value={input}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyPress}
-                className={`chatbot-input ${hasActiveButtons ? 'chatbot-input-disabled' : ''}`}
-                disabled={loading || hasActiveButtons}
+                className={`chatbot-input ${hasActiveButtons || isRecording ? 'chatbot-input-disabled' : ''}`}
+                disabled={loading || hasActiveButtons || isRecording}
             />
             <button
                 onClick={handleSend}
-                disabled={loading || !input.trim() || hasActiveButtons}
+                disabled={loading || !input.trim() || hasActiveButtons || isRecording}
                 className={`chatbot-send-button ${
-                    (loading || !input.trim() || hasActiveButtons) ? 'chatbot-send-disabled' : ''
+                    (loading || !input.trim() || hasActiveButtons || isRecording) ? 'chatbot-send-disabled' : ''
                 }`}
             >
               {loading ? (
@@ -891,6 +902,8 @@ const handleEventButton = async (button) => {
             </button>
           </div>
         </div>
+
+
 
 
         {/* Footer Tips */}
