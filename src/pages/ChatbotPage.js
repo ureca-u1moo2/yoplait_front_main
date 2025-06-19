@@ -269,7 +269,7 @@ const ChatbotPage = () => {
         conv.id === newConversation.id 
           ? { 
               ...conv, 
-              botMessages: [`❌ 오류: ${error.message}`],
+              botMessages: ['🥺 앗! 응답 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.'],
               hasError: true 
             }
           : conv
@@ -456,8 +456,26 @@ const formatSms = (amount) => {
 const handleEventButton = async (button) => {
   clearAllButtons();
 
+  // 새로운 대화 생성
+  const newConversation = {
+    id: Date.now(),
+    userMessage: '', // 이벤트 버튼은 사용자 메시지 없음
+    botMessages: [],
+    buttons: [],
+    cards: [],
+    lineSelectButton: null,
+    hasError: false
+  };
+
+  setConversations(prev => [...prev, newConversation]);
+  setLoading(true);
+
   try {
     const token = getAuthToken();
+    
+    if (!token) {
+      throw new Error('인증 토큰이 없습니다.');
+    }
 
     const response = await fetch(button.value, {
       method: 'POST',
@@ -471,20 +489,28 @@ const handleEventButton = async (button) => {
       }),
     });
 
+    if (response.status === 401) {
+      // 인증 실패
+      console.error('인증 실패: 토큰이 유효하지 않습니다.');
+      setAuthError(true);
+      setConversations(prev => prev.map(conv => 
+        conv.id === newConversation.id 
+          ? { 
+              ...conv, 
+              botMessages: ['❌ 인증이 만료되었습니다. 다시 로그인해주세요.'],
+              hasError: true 
+            }
+          : conv
+      ));
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-
-    const newConversation = {
-      id: Date.now(),
-      userMessage: '', // 이벤트 버튼은 사용자 메시지 없음
-      botMessages: [],
-      buttons: [],
-      cards: [],
-      lineSelectButton: null,
-      hasError: false
-    };
-
-    setConversations(prev => [...prev, newConversation]);
 
     while (true) {
       const { done, value } = await reader.read();
@@ -507,6 +533,20 @@ const handleEventButton = async (button) => {
 
   } catch (e) {
     console.error("이벤트 버튼 요청 실패:", e);
+    
+    const errorMessage = '🥺 앗! 요청 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    
+    setConversations(prev => prev.map(conv => 
+      conv.id === newConversation.id 
+        ? { 
+            ...conv, 
+            botMessages: [errorMessage],
+            hasError: true 
+          }
+        : conv
+    ));
+  } finally {
+    setLoading(false);
   }
 };
 
