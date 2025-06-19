@@ -234,8 +234,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(190, 24, 93, 0.3);
-  backdrop-filter: blur(10px);
+  /* background: rgba(190, 24, 93, 0.3); */
+  /* backdrop-filter: blur(10px); */
   display: flex;
   align-items: center;
   justify-content: center;
