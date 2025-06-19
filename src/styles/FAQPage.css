@@ -282,7 +282,7 @@
 .faq-answer {
   display: flex;
   gap: 1rem;
-  padding: 0 1.5rem 1.5rem 1.5rem;
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
   border-top: 1px solid rgba(244, 114, 182, 0.2);
   animation: slideDown 0.3s ease;
 }
