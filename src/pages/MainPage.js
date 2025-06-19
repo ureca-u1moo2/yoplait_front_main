@@ -508,7 +508,7 @@ const TelecomMainPage = () => {
               {/* 이모티콘 대신 이미지로 변경함 */}
               <div className="relative">
                 <img 
-                  src="/assets/cute1.png"
+                  src="/assets/Yoplait.png"
                   alt="요플레 캐릭터"
                   className="w-24 h-24 rounded-full object-cover shadow-2xl animate-bounce border-4 border-pink-200"
                 />
