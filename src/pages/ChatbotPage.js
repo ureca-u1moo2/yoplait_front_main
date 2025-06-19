@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Send, X, ArrowLeft, Lock } from 'lucide-react';
+import { MessageCircle, Send, X, ArrowLeft, Lock, Home } from 'lucide-react';
 import { userManager } from '../auth';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -436,10 +436,7 @@ const ChatbotPage = () => {
           </div>
         </div>
         
-        {/* Background Elements */}
-        <div className="chatbot-bg-element chatbot-bg-1"></div>
-        <div className="chatbot-bg-element chatbot-bg-2"></div>
-        <div className="chatbot-bg-element chatbot-bg-3"></div>
+        {/* Background Elements 삭제됨 */}
         <div className="chatbot-bg-emoji chatbot-bg-emoji-1">🍓</div>
         <div className="chatbot-bg-emoji chatbot-bg-emoji-2">🥛</div>
       </div>
@@ -757,24 +754,27 @@ const handleEventButton = async (button) => {
 
   return (
     <div className="chatbot-page-container">
+      {/* Header */}
+      <div className="chatbot-header">
+        <div className="chatbot-header-content">
+          <button 
+            onClick={() => navigate('/')}
+            className="chatbot-header-home-btn"
+          >
+            <Home className="chatbot-header-home-icon" />
+            <span>메인으로</span>
+          </button>
+          
+          <div className="chatbot-header-center">
+            <MessageCircle className="chatbot-header-bot-icon" />
+            <h1 className="chatbot-header-title">AI 챗봇</h1>
+
+          </div>
+        </div>
+      </div>
+
       {/* Chat Container */}
       <div className="chatbot-main-container">
-        {/* Welcome Section */}
-        <div className="chatbot-welcome-section">
-          <div className="chatbot-welcome-icon">
-            <div className="chatbot-welcome-circle">
-              <MessageCircle className="chatbot-welcome-message-icon" />
-            </div>
-          </div>
-          <h1 className="chatbot-welcome-title">
-            <span className="chatbot-title-highlight">AI 챗봇</span>과 대화하기
-          </h1>
-          <p className="chatbot-welcome-description">
-            안녕하세요, <strong>{userInfo?.name || userInfo?.email?.split('@')[0] || '회원'}님</strong>! 🍦<br/>
-            궁금한 요금제나 통신 관련 질문을 자유롭게 물어보세요.<br/> 
-            AI가 개인 맞춤 상담으로 친절하게 답변해드립니다!
-          </p>
-        </div>
 
         {/* Chat Messages */}
         <div ref={chatContainerRef} className="chatbot-messages-container">
@@ -865,7 +865,7 @@ const handleEventButton = async (button) => {
                 placeholder={hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
                 value={input}
                 onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 className={`chatbot-input ${hasActiveButtons ? 'chatbot-input-disabled' : ''}`}
                 disabled={loading || hasActiveButtons}
             />
@@ -899,7 +899,7 @@ const handleEventButton = async (button) => {
               <p className="chatbot-tips-text">
                 {suggestions.map((s, idx) => (
                     <span key={idx}>
-                        <strong>“{s}”</strong>
+                        <strong>"{s}"</strong>
                         {idx < suggestions.length - 1 && ', '}
                     </span>
                 ))}
@@ -909,10 +909,7 @@ const handleEventButton = async (button) => {
 
       </div>
 
-      {/* Background Elements */}
-      <div className="chatbot-bg-element chatbot-bg-1"></div>
-      <div className="chatbot-bg-element chatbot-bg-2"></div>
-      <div className="chatbot-bg-element chatbot-bg-3"></div>
+      {/* Background Elements 삭제됨 */}
       <div className="chatbot-bg-emoji chatbot-bg-emoji-1">🍓</div>
       <div className="chatbot-bg-emoji chatbot-bg-emoji-2">🥛</div>
     </div>

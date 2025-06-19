@@ -21,6 +21,7 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/chatbot" element={<ChatbotPage />} />
           <Route element={<MainLayout />}>
           <Route path="/" element={<PlanListPage />} />
           <Route path="/plans" element={<PlanListPage />} />
@@ -29,7 +30,6 @@ function App() {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/find-password" element={<FindPasswordPage />} />
           <Route path="/faq" element={<FAQPage />} />
-          <Route path="/chatbot" element={<ChatbotPage />} />
         </Route>
         </Routes>
         </NotificationProvider>
