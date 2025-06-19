@@ -42,6 +42,15 @@ function PlanDetailContent() {
     return `${amount}MB`;
   };
 
+  const formatPhoneNumber = (value) => {
+  const onlyNums = value.replace(/[^\d]/g, ''); // 숫자만 추출
+
+  if (onlyNums.length <= 3) return onlyNums;
+  if (onlyNums.length <= 7) return `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+  return `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
+};
+
+
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/plans/${id}`)
       .then(res => res.json())
@@ -170,12 +179,20 @@ function PlanDetailContent() {
 
       <div className="maid-subscribe-section">
         <h3 className="maid-subscribe-title">요금제 가입하기</h3>
-        <input
+        {/* <input
           className="maid-phone-input"
           placeholder="전화번호를 입력하세요 (예: 010-1234-5678)"
           value={phoneNumber}
           onChange={e => setPhoneNumber(e.target.value)}
+        /> */}
+        {/* 전화번호 형식 고정 */}
+        <input
+          className="maid-phone-input"
+          placeholder="전화번호를 입력하세요 (예: 010-1234-5678)"
+          value={phoneNumber}
+          onChange={e => setPhoneNumber(formatPhoneNumber(e.target.value))}
         />
+
         <button className="maid-subscribe-btn" onClick={handleSubscribe}>
           지금 가입하기
         </button>
