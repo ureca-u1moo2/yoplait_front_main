@@ -227,7 +227,7 @@ const TelecomMainPage = () => {
   };
 
   const formatSmsAmount = (smsAmount) => {
-    if (!smsAmount || smsAmount === -1 || smsAmount === 999999999) return "무제한";
+    if (smsAmount >= 15000) return "기본제공";
     return `${smsAmount}건`;
   };
 
