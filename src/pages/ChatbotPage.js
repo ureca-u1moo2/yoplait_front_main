@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 import 'styles/ChatbotPage.css';
 import { encodeWAV, downsampleBuffer } from '../utils/audioUtils';
 import { Mic, MicOff } from 'lucide-react';
-
+import { ChatCommand } from '../constants/chatCommands';
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
@@ -160,7 +160,7 @@ const ChatbotPage = () => {
   };
 
   // 공통 메시지 전송 함수
-  const sendMessage = useCallback(async (userMessage, additionalData = {}) => {
+  const sendMessage = useCallback(async (userMessage, additionalData = {}, command = ChatCommand.CHAT) => {
     if (!isLoggedIn) {
       setAuthError(true);
       return;
@@ -194,6 +194,7 @@ const ChatbotPage = () => {
       const requestBody = {
         message: userMessage,
         sessionId,
+        command,
         ...additionalData
       };
 
@@ -315,7 +316,7 @@ const ChatbotPage = () => {
     if (!input.trim() || !isLoggedIn) return;
     const userMessage = input.trim();
     setInput('');
-    await sendMessage(userMessage);
+    await sendMessage(userMessage, {}, ChatCommand.CHAT);
   };
 
   // 모든 버튼을 제거하는 공통 함수
@@ -337,7 +338,7 @@ const ChatbotPage = () => {
   const handleButtonClick = async (button) => {
     if (button.type === 'INPUT_DATA') {
       clearAllButtons();
-      await sendMessage(button.value);
+      await sendMessage(button.value,{},ChatCommand.CHAT);
     }
   };
 
@@ -353,7 +354,7 @@ const ChatbotPage = () => {
     };
 
     console.log('📦 포함된 요금제 IDs:', planIds);
-    await sendMessage(phoneNumber, additionalData);
+    await sendMessage(phoneNumber, additionalData, ChatCommand.CHAT);
   };
 
   const handleKeyPress = (e) => {
@@ -442,100 +443,45 @@ const ChatbotPage = () => {
     );
   }
 
-  const handleEventButton = async (button) => {
-    clearAllButtons();
+const handleEventButton = async (button) => {
+  clearAllButtons();
 
-    const newConversation = {
+  let command = ChatCommand.CHAT;
+
+  // 라벨에 따른 명령 분기
+  switch (button.label) {
+    case '성향 분석 하기':
+      command = ChatCommand.START_PERSONAL_ANALYSIS;
+      break;
+    case '요금제 추천 모드 종료':
+      command = ChatCommand.RESET;
+      break;
+    case '추천받기':
+    case '내게 맞는 요금제 찾기':
+      command = ChatCommand.START_RECOMMENDATION;
+      break;
+    default:
+      command = ChatCommand.CHAT;
+  }
+
+  try {
+    await sendMessage('', {}, command);
+  } catch (e) {
+    console.error('이벤트 버튼 처리 중 오류 발생:', e); 
+
+    const errorConversation = {
       id: Date.now(),
       userMessage: '',
-      botMessages: [],
+      botMessages: ['🥺 앗! 버튼 요청 처리 중 문제가 발생했습니다. 다시 시도해주세요.'],
       buttons: [],
       cards: [],
       lineSelectButton: null,
-      hasError: false
+      hasError: true
     };
 
-    setConversations(prev => [...prev, newConversation]);
-    setLoading(true);
-
-    try {
-      const token = getAuthToken();
-      
-      if (!token) {
-        throw new Error('인증 토큰이 없습니다.');
-      }
-
-      const response = await fetch(button.value, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-AUTH-TOKEN': token,
-        },
-        body: JSON.stringify({
-          sessionId,
-          userId: userInfo?.id
-        }),
-      });
-
-      if (response.status === 401) {
-        console.error('인증 실패: 토큰이 유효하지 않습니다.');
-        setAuthError(true);
-        setConversations(prev => prev.map(conv => 
-          conv.id === newConversation.id 
-            ? { 
-                ...conv, 
-                botMessages: ['❌ 인증이 만료되었습니다. 다시 로그인해주세요.'],
-                hasError: true 
-              }
-            : conv
-        ));
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              const parsed = JSON.parse(line.trim());
-              updateCurrentConversation(newConversation.id, parsed);
-            } catch {
-              updateCurrentConversation(newConversation.id, { message: line.trim() });
-            }
-          }
-        }
-      }
-
-    } catch (e) {
-      console.error("이벤트 버튼 요청 실패:", e);
-      
-      const errorMessage = '🥺 앗! 요청 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
-      
-      setConversations(prev => prev.map(conv => 
-        conv.id === newConversation.id 
-          ? { 
-              ...conv, 
-              botMessages: [errorMessage],
-              hasError: true 
-            }
-          : conv
-      ));
-    } finally {
-      setLoading(false);
-    }
-  };
+    setConversations(prev => [...prev, errorConversation]);
+  }
+};
 
   // 요금제 상세 페이지로 이동하는 함수
   const handlePlanDetail = (planId) => {
