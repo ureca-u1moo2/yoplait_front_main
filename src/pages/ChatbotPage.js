@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Send, X, ArrowLeft, Lock, Home } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft, Lock, Home, ExternalLink } from 'lucide-react';
 import { userManager } from '../auth';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import 'styles/ChatbotPage.css'; // 전용 CSS 파일 import
+import 'styles/ChatbotPage.css';
 import { encodeWAV, downsampleBuffer } from '../utils/audioUtils';
 import { Mic, MicOff } from 'lucide-react';
 
@@ -20,7 +20,7 @@ const ChatbotPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [authError, setAuthError] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false); // 초기화 상태 추가
+  const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const navigate = useNavigate();
@@ -30,10 +30,8 @@ const ChatbotPage = () => {
   const mediaRecorderRef = useRef(null);
   const bufferRef = useRef([]);
 
-
   // 버튼별 커스텀 설정을 반환하는 함수
   const getButtonConfig = (button) => {
-    // 라벨 기반으로 커스텀 설정 결정
     const configs = {
       '성향 분석 하기': {
         emoji: '🔍',
@@ -59,16 +57,20 @@ const ChatbotPage = () => {
         emoji: '💎',
         className: 'chatbot-premium-button'
       }
-      // 필요한 만큼 추가...
     };
 
-    // 기본값
     const defaultConfig = {
       emoji: button.type === 'EVENT' ? '🧠' : '🎯',
       className: button.type === 'EVENT' ? 'chatbot-event-button' : 'chatbot-input-button'
     };
 
     return configs[button.label] || defaultConfig;
+  };
+
+  // 회선 선택이 활성화되어 있는지 확인하는 함수
+  const hasActiveLineSelection = () => {
+    const lastConversation = conversations[conversations.length - 1];
+    return lastConversation?.lineSelectButton?.phoneNumbers?.length > 0;
   };
 
   // 스크롤을 맨 아래로 이동하는 함수
@@ -78,7 +80,6 @@ const ChatbotPage = () => {
     }
   };
 
-  // 대화나 대기 메시지가 업데이트될 때마다 스크롤을 아래로
   useEffect(() => {
     scrollToBottom();
   }, [conversations, waitingMessage, isWaitingForMainReply, loading]);
@@ -158,7 +159,7 @@ const ChatbotPage = () => {
     return localStorage.getItem('accessToken');
   };
 
-  // 공통 메시지 전송 함수 (인증 헤더 추가)
+  // 공통 메시지 전송 함수
   const sendMessage = useCallback(async (userMessage, additionalData = {}) => {
     if (!isLoggedIn) {
       setAuthError(true);
@@ -200,13 +201,12 @@ const ChatbotPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-AUTH-TOKEN': token, // 인증 헤더 추가
+          'X-AUTH-TOKEN': token,
         },
         body: JSON.stringify(requestBody),
       });
 
       if (response.status === 401) {
-        // 인증 실패
         console.error('인증 실패: 토큰이 유효하지 않습니다.');
         setAuthError(true);
         setConversations(prev => prev.map(conv => 
@@ -281,24 +281,21 @@ const ChatbotPage = () => {
     }
   }, [isLoggedIn, sessionId]);
 
-  // 세션 ID 생성 및 URL 파라미터 처리 (로그인된 경우에만)
+  // 세션 ID 생성 및 URL 파라미터 처리
   useEffect(() => {
     if (isLoggedIn && !isInitialized) {
       const newSessionId = crypto.randomUUID();
       setSessionId(newSessionId);
-      setIsInitialized(true); // 초기화 완료 표시
+      setIsInitialized(true);
       console.log('🆕 생성된 sessionId:', newSessionId);
 
-      // URL 파라미터에서 메시지 확인하고 자동 전송
       const urlParams = new URLSearchParams(window.location.search);
       const initialMessage = urlParams.get('message');
       
       if (initialMessage) {
-        // URL에서 message 파라미터 제거 (브라우저 히스토리 업데이트)
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
         
-        // 약간의 지연 후 메시지 자동 전송
         setTimeout(() => {
           sendMessage(decodeURIComponent(initialMessage));
         }, 1000);
@@ -312,7 +309,7 @@ const ChatbotPage = () => {
       window.addEventListener('beforeunload', handleBeforeUnload);
       return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }
-  }, [isLoggedIn, isInitialized, sendMessage]); // isInitialized 추가
+  }, [isLoggedIn, isInitialized, sendMessage]);
 
   const handleSend = async () => {
     if (!input.trim() || !isLoggedIn) return;
@@ -344,12 +341,6 @@ const ChatbotPage = () => {
     }
   };
 
-  // 취소 버튼 핸들러
-  const handleCancel = async () => {
-    clearAllButtons();
-    await sendMessage("취소");
-  };
-
   // 회선 선택 핸들러
   const handleLineSelect = async (phoneNumber) => {
     const lastConversation = conversations[conversations.length - 1];
@@ -375,22 +366,21 @@ const ChatbotPage = () => {
     return new Intl.NumberFormat('ko-KR').format(price);
   };
 
-const formatData = (amount) => {
-  if (amount === -1 || amount === 99999) return '무제한';
-  if (amount >= 1024) return `${(amount / 1024).toFixed(1)}GB`;
-  return `${amount}MB`;
-};
+  const formatData = (amount) => {
+    if (amount === -1 || amount === 99999) return '무제한';
+    if (amount >= 1024) return `${(amount / 1024).toFixed(1)}GB`;
+    return `${amount}MB`;
+  };
 
+  const formatCall = (amount) => {
+    if (amount === -1 || amount === 99999) return '무제한';
+    return `${amount}분`;
+  };
 
-const formatCall = (amount) => {
-  if (amount === -1 || amount === 99999) return '무제한';
-  return `${amount}분`;
-};
-
-const formatSms = (amount) => {
-  if (amount >= 15000) return `기본제공`;
-  return `${amount}건`;
-};
+  const formatSms = (amount) => {
+    if (amount >= 15000) return `기본제공`;
+    return `${amount}건`;
+  };
 
   // 점점점 애니메이션 컴포넌트
   const TypingIndicator = () => {
@@ -446,111 +436,111 @@ const formatSms = (amount) => {
           </div>
         </div>
         
-        {/* Background Elements 삭제됨 */}
         <div className="chatbot-bg-emoji chatbot-bg-emoji-1">🍓</div>
         <div className="chatbot-bg-emoji chatbot-bg-emoji-2">🥛</div>
       </div>
     );
   }
 
-const handleEventButton = async (button) => {
-  clearAllButtons();
+  const handleEventButton = async (button) => {
+    clearAllButtons();
 
-  // 새로운 대화 생성
-  const newConversation = {
-    id: Date.now(),
-    userMessage: '', // 이벤트 버튼은 사용자 메시지 없음
-    botMessages: [],
-    buttons: [],
-    cards: [],
-    lineSelectButton: null,
-    hasError: false
-  };
+    const newConversation = {
+      id: Date.now(),
+      userMessage: '',
+      botMessages: [],
+      buttons: [],
+      cards: [],
+      lineSelectButton: null,
+      hasError: false
+    };
 
-  setConversations(prev => [...prev, newConversation]);
-  setLoading(true);
+    setConversations(prev => [...prev, newConversation]);
+    setLoading(true);
 
-  try {
-    const token = getAuthToken();
-    
-    if (!token) {
-      throw new Error('인증 토큰이 없습니다.');
-    }
+    try {
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error('인증 토큰이 없습니다.');
+      }
 
-    const response = await fetch(button.value, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-AUTH-TOKEN': token,
-      },
-      body: JSON.stringify({
-        sessionId,
-        userId: userInfo?.id
-      }),
-    });
+      const response = await fetch(button.value, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-AUTH-TOKEN': token,
+        },
+        body: JSON.stringify({
+          sessionId,
+          userId: userInfo?.id
+        }),
+      });
 
-    if (response.status === 401) {
-      // 인증 실패
-      console.error('인증 실패: 토큰이 유효하지 않습니다.');
-      setAuthError(true);
+      if (response.status === 401) {
+        console.error('인증 실패: 토큰이 유효하지 않습니다.');
+        setAuthError(true);
+        setConversations(prev => prev.map(conv => 
+          conv.id === newConversation.id 
+            ? { 
+                ...conv, 
+                botMessages: ['❌ 인증이 만료되었습니다. 다시 로그인해주세요.'],
+                hasError: true 
+              }
+            : conv
+        ));
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const parsed = JSON.parse(line.trim());
+              updateCurrentConversation(newConversation.id, parsed);
+            } catch {
+              updateCurrentConversation(newConversation.id, { message: line.trim() });
+            }
+          }
+        }
+      }
+
+    } catch (e) {
+      console.error("이벤트 버튼 요청 실패:", e);
+      
+      const errorMessage = '🥺 앗! 요청 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      
       setConversations(prev => prev.map(conv => 
         conv.id === newConversation.id 
           ? { 
               ...conv, 
-              botMessages: ['❌ 인증이 만료되었습니다. 다시 로그인해주세요.'],
+              botMessages: [errorMessage],
               hasError: true 
             }
           : conv
       ));
-      return;
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split('\n');
-
-      for (const line of lines) {
-        if (line.trim()) {
-          try {
-            const parsed = JSON.parse(line.trim());
-            updateCurrentConversation(newConversation.id, parsed);
-          } catch {
-            updateCurrentConversation(newConversation.id, { message: line.trim() });
-          }
-        }
-      }
-    }
-
-  } catch (e) {
-    console.error("이벤트 버튼 요청 실패:", e);
-    
-    const errorMessage = '🥺 앗! 요청 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
-    
-    setConversations(prev => prev.map(conv => 
-      conv.id === newConversation.id 
-        ? { 
-            ...conv, 
-            botMessages: [errorMessage],
-            hasError: true 
-          }
-        : conv
-    ));
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  // 요금제 상세 페이지로 이동하는 함수
+  const handlePlanDetail = (planId) => {
+    window.open(`/plans/${planId}`, '_blank');
+  };
 
   // 메시지 렌더링
   const renderMessage = (content, isUser, key) => {
@@ -558,14 +548,14 @@ const handleEventButton = async (button) => {
       <div key={key} className={`chatbot-message-row ${isUser ? 'chatbot-message-user' : 'chatbot-message-bot'}`}>
         <div className={`chatbot-message-bubble ${isUser ? 'chatbot-user-bubble' : 'chatbot-bot-bubble'}`}>
           {isUser ? content : <ReactMarkdown
-  remarkPlugins={[remarkGfm]}
-  components={{
-    p: ({ children }) => <p>{children}</p>,
-  }}
->
-  {content.replace(/\n/g, '  \n')}
-</ReactMarkdown>
-}
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => <p>{children}</p>,
+            }}
+          >
+            {content.replace(/\n/g, '  \n')}
+          </ReactMarkdown>
+          }
         </div>
       </div>
     );
@@ -577,7 +567,6 @@ const handleEventButton = async (button) => {
     return (
       <div key={index} className="chatbot-plan-card">
         <div className="chatbot-card-header">
-          <span className="chatbot-card-emoji">🍓</span>
           <h3 className="chatbot-card-title">요금제 정보</h3>
         </div>
         
@@ -593,19 +582,29 @@ const handleEventButton = async (button) => {
           </div>
           
           <div className="chatbot-detail-row">
-  <span className="chatbot-detail-label">데이터:</span>
-  <span className="chatbot-detail-value">{formatData(value.dataAmount)}</span>
-</div>
+            <span className="chatbot-detail-label">데이터:</span>
+            <span className="chatbot-detail-value">{formatData(value.dataAmount)}</span>
+          </div>
 
-<div className="chatbot-detail-row">
-  <span className="chatbot-detail-label">통화:</span>
-  <span className="chatbot-detail-value">{formatCall(value.callAmount)}</span>
-</div>
+          <div className="chatbot-detail-row">
+            <span className="chatbot-detail-label">통화:</span>
+            <span className="chatbot-detail-value">{formatCall(value.callAmount)}</span>
+          </div>
 
-<div className="chatbot-detail-row">
-  <span className="chatbot-detail-label">문자:</span>
-  <span className="chatbot-detail-value">{formatSms(value.smsAmount)}</span>
-</div>
+          <div className="chatbot-detail-row">
+            <span className="chatbot-detail-label">문자:</span>
+            <span className="chatbot-detail-value">{formatSms(value.smsAmount)}</span>
+          </div>
+        </div>
+
+        <div className="chatbot-card-actions">
+          <button
+            onClick={() => handlePlanDetail(value.id)}
+            className="chatbot-detail-button"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            상세보기
+          </button>
         </div>
       </div>
     );
@@ -615,7 +614,9 @@ const handleEventButton = async (button) => {
     const elements = [];
     
     // 사용자 메시지
-    elements.push(renderMessage(conversation.userMessage, true, `user-${conversation.id}`));
+    if (conversation.userMessage && conversation.userMessage.trim()) {
+      elements.push(renderMessage(conversation.userMessage, true, `user-${conversation.id}`));
+    }
     
     // 봇 메시지들
     conversation.botMessages.forEach((botMsg, idx) => {
@@ -659,11 +660,8 @@ const handleEventButton = async (button) => {
       );
     }
     
-    
-    // 버튼들 (커스터마이징 적용)
+    // 버튼들
     if (conversation.buttons.length > 0) {
-      const hasInputDataButton = conversation.buttons.some(btn => btn.type === 'INPUT_DATA');
-
       elements.push(
         <div key={`buttons-${conversation.id}`} className="chatbot-buttons-container">
           <div className="chatbot-buttons-list">
@@ -783,7 +781,6 @@ const handleEventButton = async (button) => {
           const transcript = parsed.transcript?.trim();
           if (transcript) {
             setInput(transcript);
-            // await sendMessage(transcript); 음성 번역 시 바로 전송
           }
         } catch (e) {
           console.error("STT 응답 파싱 실패:", e);
@@ -830,7 +827,6 @@ const handleEventButton = async (button) => {
 
       {/* Chat Container */}
       <div className="chatbot-main-container">
-
         {/* Chat Messages */}
         <div ref={chatContainerRef} className="chatbot-messages-container">
           {conversations.length === 0 && !loading && !waitingMessage ? (
@@ -860,9 +856,14 @@ const handleEventButton = async (button) => {
                   </button>
                 </div>
               </div>
-              {hasActiveButtons && (
+              {hasActiveButtons && !hasActiveLineSelection() && (
                 <div className="chatbot-waiting-buttons">
                   🔒 버튼 선택 대기 중입니다. 아래의 버튼을 클릭해주세요.
+                </div>
+              )}
+              {hasActiveLineSelection() && (
+                <div className="chatbot-waiting-buttons">
+                  📞 회선을 선택해주세요.
                 </div>
               )}
             </div>
@@ -906,75 +907,71 @@ const handleEventButton = async (button) => {
 
         {/* 오디오 시각화 */}
         {isRecording && (
-            <div className="audio-visualizer">
-              <div className="audio-bar"></div>
-              <div className="audio-bar"></div>
-              <div className="audio-bar"></div>
-              <div className="audio-bar"></div>
-              <div className="audio-bar"></div>
-            </div>
+          <div className="audio-visualizer">
+            <div className="audio-bar"></div>
+            <div className="audio-bar"></div>
+            <div className="audio-bar"></div>
+            <div className="audio-bar"></div>
+            <div className="audio-bar"></div>
+          </div>
         )}
 
         {/* Input Section */}
         <div className="chatbot-input-container">
           <div className="chatbot-input-wrapper">
             <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`chatbot-mic-button ${isRecording ? 'chatbot-mic-recording' : ''}`}
-                title={isRecording ? '녹음 중지' : '음성 입력'}
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`chatbot-mic-button ${isRecording ? 'chatbot-mic-recording' : ''}`}
+              title={isRecording ? '녹음 중지' : '음성 입력'}
             >
               {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
 
             <input
-                type="text"
-                placeholder={isRecording ? "녹음 중입니다..." : hasActiveButtons ? "버튼을 클릭해주세요" : "메시지를 입력하세요"}
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyPress}
-                className={`chatbot-input ${hasActiveButtons || isRecording ? 'chatbot-input-disabled' : ''}`}
-                disabled={loading || hasActiveButtons || isRecording}
+              type="text"
+              placeholder={isRecording ? "녹음 중입니다..." : (hasActiveButtons || hasActiveLineSelection()) ? "선택을 완료해주세요" : "메시지를 입력하세요"}
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyPress}
+              className={`chatbot-input ${(hasActiveButtons || hasActiveLineSelection() || isRecording) ? 'chatbot-input-disabled' : ''}`}
+              disabled={loading || hasActiveButtons || hasActiveLineSelection() || isRecording}
             />
             <button
-                onClick={handleSend}
-                disabled={loading || !input.trim() || hasActiveButtons || isRecording}
-                className={`chatbot-send-button ${
-                    (loading || !input.trim() || hasActiveButtons || isRecording) ? 'chatbot-send-disabled' : ''
-                }`}
+              onClick={handleSend}
+              disabled={loading || !input.trim() || hasActiveButtons || hasActiveLineSelection() || isRecording}
+              className={`chatbot-send-button ${
+                (loading || !input.trim() || hasActiveButtons || hasActiveLineSelection() || isRecording) ? 'chatbot-send-disabled' : ''
+              }`}
             >
               {loading ? (
-                  <div className="chatbot-send-loading">
-                    <div className="chatbot-send-spinner"></div>
-                    전송중
-                  </div>
+                <div className="chatbot-send-loading">
+                  <div className="chatbot-send-spinner"></div>
+                  전송중
+                </div>
               ) : (
-                  <div className="chatbot-send-content">
-                    <Send className="chatbot-send-icon" />
-                    전송
-                  </div>
+                <div className="chatbot-send-content">
+                  <Send className="chatbot-send-icon" />
+                  전송
+                </div>
               )}
             </button>
           </div>
         </div>
 
-
-
-
         {/* Footer Tips */}
         {suggestions.length > 0 && (
-            <div className="chatbot-tips">
-              <p className="chatbot-tips-title">💡 이런 문장은 어때요?</p>
-              <p className="chatbot-tips-text">
-                {suggestions.map((s, idx) => (
-                    <span key={idx}>
-                        <strong>"{s}"</strong>
-                        {idx < suggestions.length - 1 && ', '}
-                    </span>
-                ))}
-              </p>
-            </div>
+          <div className="chatbot-tips">
+            <p className="chatbot-tips-title">💡 이런 문장은 어때요?</p>
+            <p className="chatbot-tips-text">
+              {suggestions.map((s, idx) => (
+                <span key={idx}>
+                  <strong>"{s}"</strong>
+                  {idx < suggestions.length - 1 && ', '}
+                </span>
+              ))}
+            </p>
+          </div>
         )}
-
       </div>
 
       <div className="chatbot-bg-emoji chatbot-bg-emoji-1">🍓</div>

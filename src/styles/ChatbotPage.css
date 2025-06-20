@@ -740,6 +740,8 @@ display: flex;
   backdrop-filter: blur(10px);
   flex-shrink: 0; /* 카드가 압축되지 않도록 설정 */
   scroll-snap-align: start; /* 스크롤 스냅 효과 */
+  display: flex;
+  flex-direction: column;
 }
 
 .chatbot-card-header {
@@ -779,12 +781,20 @@ display: flex;
 .chatbot-plan-description {
   font-size: 0.875rem;
   color: #6b7280;
+  line-height: 1.4;
+  height: 6rem; /* 설명 높이 고정 (약 2.5줄) */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
 }
 
 .chatbot-card-details {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1; /* 남은 공간 차지 */
+  margin-bottom: 1rem;
 }
 
 .chatbot-detail-row {
@@ -813,9 +823,53 @@ display: flex;
   font-size: 1.125rem;
 }
 
+/* 요금제 카드 액션 버튼 영역 */
+.chatbot-card-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(236, 72, 153, 0.1);
+}
+
+/* 상세보기 버튼 스타일 */
+.chatbot-detail-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  text-decoration: none;
+}
+
+.chatbot-detail-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, #5856f3 0%, #7c3aed 100%);
+}
+
+.chatbot-detail-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+}
+
+.chatbot-detail-button:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
 /* 회선 선택 */
 .chatbot-line-select-container {
   margin: 1rem 0;
+  display: flex;
+  justify-content: left; /* 중앙 정렬 */
 }
 
 .chatbot-line-select-box {
@@ -824,14 +878,18 @@ display: flex;
   border-radius: 1.5rem;
   padding: 1.5rem;
   backdrop-filter: blur(10px);
+  max-width: 400px; /* 최대 너비 제한 */
+  width: 100%;
 }
 
 .chatbot-line-select-header {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  justify-content: left; /* 헤더 중앙 정렬 */
+  margin-bottom: 1.5rem;
   font-weight: 600;
   color: #374151;
+  font-size: 1.1rem;
 }
 
 .chatbot-line-emoji {
@@ -841,8 +899,9 @@ display: flex;
 
 .chatbot-line-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column; /* 세로 배치로 변경 */
+  gap: 0.75rem; /* 간격 조정 */
+  align-items: center; /* 중앙 정렬 */
 }
 
 .chatbot-line-button {
@@ -850,15 +909,20 @@ display: flex;
   color: white;
   border: none;
   border-radius: 1rem;
-  padding: 0.75rem 1.5rem;
-  font-weight: 500;
+  padding: 1rem 2rem; /* 패딩 증가 */
+  font-weight: 600;
+  font-size: 1rem; /* 폰트 크기 증가 */
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100%; /* 전체 너비 */
+  max-width: 280px; /* 최대 너비 제한 */
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2);
 }
 
 .chatbot-line-button:hover:not(.chatbot-btn-disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+  background: linear-gradient(135deg, #db2777, #e11d48);
 }
 
 /* 버튼 컨테이너 */
@@ -1310,8 +1374,6 @@ display: flex;
   box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
 }
 
-
-
 /* Markdown Styles */
 .chatbot-bot-bubble p {
   margin: 0.5em 0;
@@ -1438,7 +1500,6 @@ display: flex;
   color: #f06292;
 }
 
-
 /* 마이크 버튼 녹음 상태 스타일 */
 .chatbot-mic-recording {
   color: #ef4444 !important;
@@ -1494,4 +1555,3 @@ display: flex;
     opacity: 1;
   }
 }
-
