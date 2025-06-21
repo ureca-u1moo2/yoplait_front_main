@@ -449,15 +449,19 @@ const handleEventButton = async (button) => {
   let command = ChatCommand.CHAT;
 
   // 라벨에 따른 명령 분기
+// 라벨에 따른 명령 분기 - 정확한 라벨 매칭
   switch (button.label) {
     case '성향 분석 하기':
-      command = ChatCommand.START_PERSONAL_ANALYSIS;
+      command = ChatCommand.START_ANALYSIS;
       break;
     case '요금제 추천 모드 종료':
-      command = ChatCommand.RESET;
+      console.log("종료 버튼 클릭");
+      command = ChatCommand.CANCEL;
+      break;  
+    case '내게 맞는 요금제 찾기':  // 이 부분이 수정되었습니다
+      command = ChatCommand.START_RECOMMENDATION;
       break;
-    case '추천받기':
-    case '내게 맞는 요금제 찾기':
+    case '추천받기':  // 기존 케이스도 유지 (다른 곳에서 사용될 수 있음)
       command = ChatCommand.START_RECOMMENDATION;
       break;
     default:
