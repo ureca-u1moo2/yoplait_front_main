@@ -8,6 +8,7 @@ import 'styles/ChatbotPage.css';
 import { encodeWAV, downsampleBuffer } from '../utils/audioUtils';
 import { Mic, MicOff } from 'lucide-react';
 import { ChatCommand } from '../constants/chatCommands';
+import rehypeRaw from 'rehype-raw';
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
@@ -457,6 +458,7 @@ const handleEventButton = async (button) => {
     case '요금제 추천 모드 종료':
       console.log("종료 버튼 클릭");
       command = ChatCommand.CANCEL;
+      
       break;  
     case '내게 맞는 요금제 찾기':  // 이 부분이 수정되었습니다
       command = ChatCommand.START_RECOMMENDATION;
@@ -493,23 +495,102 @@ const handleEventButton = async (button) => {
   };
 
   // 메시지 렌더링
-  const renderMessage = (content, isUser, key) => {
-    return (
-      <div key={key} className={`chatbot-message-row ${isUser ? 'chatbot-message-user' : 'chatbot-message-bot'}`}>
-        <div className={`chatbot-message-bubble ${isUser ? 'chatbot-user-bubble' : 'chatbot-bot-bubble'}`}>
-          {isUser ? content : <ReactMarkdown
+  // 완전한 텍스트 포맷팅 처리 함수
+// renderMessage 함수 - 수정된 버전
+const renderMessage = (content, isUser, key) => {
+  // 모든 텍스트 포맷팅을 처리하는 전처리 함수
+  const preprocessContent = (text) => {
+    return text
+      // 이스케이프된 줄바꿈 처리
+      .replace(/\\n/g, '\n')
+      // 연속된 줄바꿈 정리
+      .replace(/\n\n+/g, '\n\n')
+      // 마크다운 줄바꿈으로 변환
+      .replace(/\n/g, '  \n')
+      // 불필요한 공백 제거
+      .trim();
+  };
+
+  return (
+    <div key={key} className={`chatbot-message-row ${isUser ? 'chatbot-message-user' : 'chatbot-message-bot'}`}>
+      <div className={`chatbot-message-bubble ${isUser ? 'chatbot-user-bubble' : 'chatbot-bot-bubble'}`}>
+        {isUser ? content : 
+          <ReactMarkdown
             remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]} // require 제거하고 import된 변수 사용
             components={{
-              p: ({ children }) => <p>{children}</p>,
+              // 문단 스타일링
+              p: ({ children }) => <p style={{ margin: '0.5em 0', lineHeight: '1.5' }}>{children}</p>,
+              
+              // 제목들
+              h1: ({ children }) => <h1 style={{ fontSize: '1.5em', fontWeight: 'bold', margin: '1em 0 0.5em 0' }}>{children}</h1>,
+              h2: ({ children }) => <h2 style={{ fontSize: '1.3em', fontWeight: 'bold', margin: '1em 0 0.5em 0' }}>{children}</h2>,
+              h3: ({ children }) => <h3 style={{ fontSize: '1.2em', fontWeight: 'bold', margin: '1em 0 0.5em 0' }}>{children}</h3>,
+              
+              // 강조 표시들
+              strong: ({ children }) => <strong style={{ fontWeight: 'bold', color: '#2563eb' }}>{children}</strong>,
+              b: ({ children }) => <strong style={{ fontWeight: 'bold', color: '#2563eb' }}>{children}</strong>,
+              em: ({ children }) => <em style={{ fontStyle: 'italic', color: '#7c3aed' }}>{children}</em>,
+              i: ({ children }) => <em style={{ fontStyle: 'italic', color: '#7c3aed' }}>{children}</em>,
+              
+              // 리스트들
+              ul: ({ children }) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ul>,
+              ol: ({ children }) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ol>,
+              li: ({ children }) => <li style={{ margin: '0.2em 0' }}>{children}</li>,
+              
+              // 코드
+              code: ({ children, inline }) => 
+                inline ? 
+                  <code style={{ 
+                    backgroundColor: '#f3f4f6', 
+                    padding: '0.2em 0.4em', 
+                    borderRadius: '3px',
+                    fontSize: '0.9em',
+                    fontFamily: 'monospace'
+                  }}>{children}</code> :
+                  <pre style={{ 
+                    backgroundColor: '#f3f4f6', 
+                    padding: '1em', 
+                    borderRadius: '6px',
+                    overflow: 'auto',
+                    fontSize: '0.9em',
+                    fontFamily: 'monospace'
+                  }}><code>{children}</code></pre>,
+              
+              // 인용
+              blockquote: ({ children }) => (
+                <blockquote style={{ 
+                  borderLeft: '4px solid #e5e7eb', 
+                  paddingLeft: '1em', 
+                  margin: '1em 0',
+                  fontStyle: 'italic',
+                  color: '#6b7280'
+                }}>{children}</blockquote>
+              ),
+              
+              // 링크
+              a: ({ children, href }) => (
+                <a href={href} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   style={{ color: '#2563eb', textDecoration: 'underline' }}
+                >{children}</a>
+              ),
+              
+              // 구분선
+              hr: () => <hr style={{ margin: '1em 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />,
+              
+              // 줄바꿈
+              br: () => <br />,
             }}
           >
-            {content.replace(/\n/g, '  \n')}
+            {preprocessContent(content)}
           </ReactMarkdown>
-          }
-        </div>
+        }
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   const renderCard = (card, index) => {
     const { value } = card;
